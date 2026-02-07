@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Associação Hunter - Acesso Restrito</title>
+    <link rel="icon" href="img/logo-hxh.png" type="image/png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- TELA DE LOGIN -->
+    <div id="login-screen">
+        <img src="img/logo-hxh.png" class="hunter-logo" style="max-width: 250px; margin-bottom: 20px;" alt="Hunter Logo">
+        <h1>ASSOCIAÇÃO HUNTER</h1>
+        <p>SISTEMA DE INFORMAÇÃO GLOBAL</p>
+        
+        <div class="card-slot">
+            <p>AUTENTICAÇÃO DE HUNTER</p>
+            <br>
+            <input type="text" id="login-user" class="login-input" placeholder="CODINOME / ID" autocomplete="off">
+            <input type="password" id="login-pass" class="login-input" placeholder="SENHA DE ACESSO" autocomplete="new-password">
+            <button onclick="attemptLogin()">[ ENTRAR ]</button>
+        </div>
+        <p id="login-msg" style="margin-top: 20px; height: 20px;"></p>
+        <footer style="margin-top: 40px; color: rgba(255, 255, 255, 0.5); font-size: 0.8rem; font-family: var(--font-mono);">
+            &copy; 1999 Associação Hunter. Todos os direitos reservados.<br>
+            Rede de Dados Oficial - Acesso Restrito
+        </footer>
+    </div>
+
+    <!-- INTERFACE PRINCIPAL -->
+    <div id="main-interface" class="hidden container">
+        <header>
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <img src="img/logo-hxh.png" style="height: 50px;" alt="Hunter Logo">
+                <div style="font-weight: bold; font-size: 1.5rem; color: var(--hunter-primary); font-family: var(--font-mono); text-shadow: 0 0 10px rgba(0, 210, 255, 0.5);">HUNTER SITE</div>
+            </div>
+            <div id="user-info" style="font-family: var(--font-mono);">
+                Hunter: <span id="display-username">VISITANTE</span> | <span style="color: var(--hunter-primary)">ONLINE</span>
+            </div>
+        </header>
+
+        <nav>
+            <button onclick="showSection('profile')" class="nav-btn">MEU PERFIL</button>
+            <button onclick="showSection('news')" class="nav-btn active">NOTÍCIAS GLOBAIS</button>
+            <button onclick="showSection('locations')" class="nav-btn">LOCALIDADES</button>
+            <button onclick="showSection('creatures')" class="nav-btn">CRIATURAS MÁGICAS</button>
+            <button onclick="showSection('hunter-search')" class="nav-btn">BUSCA DE HUNTERS</button>
+            <button onclick="showSection('jobs')" class="nav-btn">QUADRO DE MISSÕES</button>
+            <button onclick="showSection('tavern')" class="nav-btn">TAVERNA</button>
+            <button onclick="showSection('items')" class="nav-btn">LEILÕES & ITENS</button>
+            <button onclick="logout()" style="margin-left: auto; color: var(--hunter-secondary);">SAIR</button>
+        </nav>
+
+        <!-- SEÇÃO: PERFIL DO USUÁRIO -->
+        <div id="profile" class="content-section hidden">
+            <h3>FICHA DE DADOS PESSOAIS</h3>
+            <div style="display: flex; gap: 30px; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 250px; max-width: 300px;">
+                    <img id="profile-display-img" src="" style="width: 100%; border-radius: 8px; border: 2px solid var(--hunter-primary); box-shadow: 0 0 15px rgba(0,210,255,0.2);">
+                </div>
+                <div style="flex: 2; min-width: 300px;">
+                    <h2 id="profile-display-name" style="color: #fff; border-bottom: 2px solid var(--hunter-secondary); padding-bottom: 10px; margin-top: 0;"></h2>
+                    <p><strong>RANK:</strong> <span id="profile-display-rank" style="color: var(--hunter-yellow); font-weight: bold;"></span></p>
+                    <div id="profile-data" style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 8px; margin-top: 20px; font-family: var(--font-mono);"></div>
+                    
+                    <h3 style="color: var(--hunter-primary); margin-top: 30px; border-bottom: 1px solid var(--hunter-border); padding-bottom: 10px;">CAIXA DE ENTRADA</h3>
+                    <div id="msg-list" style="font-family: var(--font-mono);"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SEÇÃO: NOTÍCIAS -->
+        <div id="news" class="content-section">
+            <h3>BOLETIM INFORMATIVO GLOBAL</h3>
+            <div class="news-grid" id="news-container"></div>
+        </div>
+
+        <!-- SEÇÃO: LOCALIDADES -->
+        <div id="locations" class="content-section hidden">
+            <h3>BANCO DE DADOS GEOGRÁFICO</h3>
+            <div id="location-results" class="news-grid"></div>
+        </div>
+
+        <!-- SEÇÃO: CRIATURAS -->
+        <div id="creatures" class="content-section hidden">
+            <h3>CATÁLOGO DE ESPÉCIES PERIGOSAS</h3>
+            <input type="text" class="search-bar" placeholder="Pesquisar espécie..." onkeyup="searchCreatures(this.value)">
+            <div id="creature-results" class="news-grid"></div>
+        </div>
+
+        <!-- SEÇÃO: BUSCA DE HUNTERS -->
+        <div id="hunter-search" class="content-section hidden">
+            <h3>DIRETÓRIO OFICIAL DE HUNTERS</h3>
+            <input type="text" class="search-bar" placeholder="o que voce procura?" onkeyup="searchHunters(this.value)">
+            <div id="hunter-results" class="news-grid"></div>
+        </div>
+
+        <!-- SEÇÃO: MISSÕES -->
+        <div id="jobs" class="content-section hidden">
+            <h3>LISTA DE TRABALHOS DISPONÍVEIS</h3>
+            <ul class="job-list" style="list-style: none; padding: 0;">
+                <li style="text-align: center; color: #888;">Nenhuma missão disponível no momento.</li>
+            </ul>
+        </div>
+
+        <!-- SEÇÃO: TAVERNA -->
+        <div id="tavern" class="content-section hidden">
+            <h3>A TAVERNA (FÓRUM ANÔNIMO)</h3>
+            <div class="tavern-post">
+                <span class="tavern-user">User_Gamer_001:</span> Alguém sabe onde conseguir um console JoyStation para Greed Island? Estou disposto a pagar o dobro.
+            </div>
+            <div class="tavern-post">
+                <span class="tavern-user">Kurapika_Eyes:</span> Busco informações sobre olhos escarlates. Pago em dinheiro ou troca de informações.
+            </div>
+        </div>
+
+        <!-- SEÇÃO: ITENS -->
+        <div id="items" class="content-section hidden">
+            <h3>CATÁLOGO DE LEILÕES E ITENS ESPECIAIS</h3>
+            <table style="width: 100%; text-align: left; border-collapse: collapse;">
+                <tr style="border-bottom: 1px solid var(--hunter-border);">
+                    <th>Item</th>
+                    <th>Preço Atual</th>
+                    <th>Status</th>
+                </tr>
+                <tr>
+                    <td>Greed Island (Console + Memory Card)</td>
+                    <td>8.9 Bilhões Jenny</td>
+                    <td>Esgotado</td>
+                </tr>
+                <tr>
+                    <td>Celular Besouro</td>
+                    <td>200.000 Jenny</td>
+                    <td>Disponível</td>
+                </tr>
+            </table>
+        </div>
+
+        <footer style="text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--hunter-border); color: rgba(255, 255, 255, 0.4); font-size: 0.8rem; font-family: var(--font-mono);">
+            &copy; 1999 Associação Hunter. Todos os direitos reservados.<br>
+            Rede de Dados Oficial - Acesso Restrito
+        </footer>
+    </div>
+
+    <!-- MODAL DE PERSONAGEM -->
+    <div id="character-modal" class="hidden">
+        <div class="modal-content" style="border-color: var(--hunter-primary);">
+            <span class="close-btn" onclick="closeCharacterModal()">&times;</span>
+            <div style="text-align: center; margin-bottom: 20px;">
+                <img id="char-modal-img" class="modal-img" style="width: 200px; height: 200px; object-fit: cover; border-radius: 50%; border: 4px solid var(--hunter-primary); margin: 0 auto;" src="">
+                <h2 id="char-modal-name" style="color: var(--hunter-primary); margin-top: 10px;"></h2>
+                <p style="margin: 5px 0; font-size: 0.9rem; color: var(--hunter-accent);">NEN: <span id="char-modal-nen" style="color: #fff; text-transform: uppercase;"></span></p>
+                <p><strong>TIPO:</strong> <span id="char-modal-type" style="color: #fff"></span> | <strong>STATUS:</strong> <span id="char-modal-status"></span></p>
+            </div>
+            <div style="border-top: 1px solid #333; padding-top: 15px;">
+                    <p id="char-modal-desc" style="color: #ccc; line-height: 1.6; font-family: var(--font-mono);"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE LOCALIDADE -->
+    <div id="location-modal" class="hidden">
+        <div class="modal-content" style="border-color: var(--hunter-accent);">
+            <span class="close-btn" onclick="closeLocationModal()">&times;</span>
+            <div style="text-align: center; margin-bottom: 20px;">
+                <img id="loc-modal-img" class="modal-img" style="width: 100%; height: 300px; object-fit: cover; border-radius: 4px; border: 2px solid var(--hunter-accent); margin: 0 auto;" src="">
+                <h2 id="loc-modal-name" style="color: var(--hunter-accent); margin-top: 10px;"></h2>
+                <p style="color: var(--hunter-secondary); font-weight: bold; margin-top: 5px;">NÍVEL DE RISCO: <span id="loc-modal-risk" style="color: #fff;"></span></p>
+            </div>
+            <div style="border-top: 1px solid #333; padding-top: 15px;">
+                    <p id="loc-modal-desc" style="color: #ccc; line-height: 1.6; font-family: var(--font-mono); font-size: 1.1rem;"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE MENSAGEM -->
+    <div id="message-modal" class="hidden">
+        <div class="modal-content" style="border-color: var(--hunter-primary);">
+            <span class="close-btn" onclick="closeMessageModal()">&times;</span>
+            <h2 id="msg-modal-subject" style="color: var(--hunter-primary); margin-top: 0;"></h2>
+            <p style="color: #888; font-size: 0.9rem;">DE: <span id="msg-modal-from" style="color: #fff;"></span> | DATA: <span id="msg-modal-date"></span></p>
+            <div style="border-top: 1px solid #333; padding-top: 20px; margin-top: 20px;">
+                <p id="msg-modal-content" style="color: #ccc; line-height: 1.6; font-family: var(--font-mono); white-space: pre-wrap;"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- DATA ---
+        const charDB = [
+            { name: "Kurokawa Akin Min", rank: "Rank D", type: "Hunter Novato", nenType: "Desconhecido", status: "Vivo", img: "https://media.discordapp.net/attachments/1456713520413675804/1460078727642878015/file_0000000073ec71f5ab9f2ed8934c9d64.png?ex=6987e2c7&is=69869147&hm=21249bc9e1ddb118c1c9c347aa63a89ba111ff826c93265a4ba4f31fc26cef58&=&format=webp&quality=lossless&width=656&height=656", desc: "Caçador recém-formado da 289ª Turma. Sobrevivente à invasão durante o Exame Hunter. Atualmente em fase de treinamento básico de Nen. Potencial monitorado pela Associação." },
+            { name: "Kageshiro Kuruta", rank: "Rank D", type: "Hunter Novato", nenType: "Materialização (Provável)", status: "Vivo", img: "https://media.discordapp.net/attachments/1456713520413675804/1460080250749845504/1767759806552.jpg?ex=6987e432&is=698692b2&hm=6a7664fe9902cca4f4c3533fa89f7d06c97b64d565b7c45f35d88f2a45aed17c&=&format=webp&width=375&height=656", desc: "Sobrevivente do Clã Kuruta. Caçador recém-formado. Demonstra alta aptidão para combate tático. Motivação primária: Recuperação de artefatos culturais perdidos." },
+            { name: "Agnes Morrígan Zoldyck", rank: "Rank D", type: "Hunter Novato", nenType: "Transformação", status: "Vivo", img: "https://media.discordapp.net/attachments/1456713520413675804/1460079404226052106/1767762588568.jpg?ex=6987e368&is=698691e8&hm=0105656312d8058f570226d02445690efd92e5ff65c175c243690cd8bbc3c692&=&format=webp&width=510&height=656", desc: "Membro afastado da Família Zoldyck. Caçadora recém-formada. Especialista em técnicas de assassinato silencioso adaptadas para missões de caça. Perfil psicológico estável, mas letal." },
+            { name: "Melissa Ackerman", rank: "Rank D", type: "Hunter Novato", nenType: "Reforço", status: "Vivo", img: "https://media.discordapp.net/attachments/1456713520413675804/1460078117778362612/WhatsApp_Image_2026-01-11_at_19.14.38.jpeg?ex=6987e236&is=698690b6&hm=6ea9b18882fece5aae729c5eca111734bdb84003f729ea797bbbd9b87fe01392&=&format=webp&width=656&height=656", desc: "Caçadora recém-formada. Origem: Cidade do Meteoro. Demonstra força física acima da média e lealdade extrema aos seus aliados. Sobrevivente da invasão ao Exame." },
+            { name: "Morana Ravenscar", rank: "Rank D", type: "Hunter Novato", nenType: "Especialista", status: "Vivo", img: "https://media.discordapp.net/attachments/1456713520413675804/1460083643182616639/ChatGPT_Image_7_de_jan._de_2026_11_53_05.png?ex=6988901b&is=69873e9b&hm=79425292638e6c88404a6895858323ecd642f0ded109754a67dded8bf50c0aa1&=&format=webp&quality=lossless&width=437&height=656", desc: "Caçadora recém-formada. Origem nobre britânica. Especialista em ocultismo e história antiga. Perfil analítico com alto potencial estratégico." },
+            { name: "Gon Freecss", type: "Hunter (Licenciado)", nenType: "Reforço", status: "Vivo", img: "https://i.pinimg.com/1200x/45/87/1a/45871a387861ca0b7517fc836da84a31.jpg", desc: "Filho de Ging Freecss. Primeiro humano a completar o jogo Greed Island. Relatório de Incidente: Utilizou um Voto e Restrição de nível calamidade para neutralizar Neferpitou. Atualmente sem acesso ao Nen (Canais fechados). Retornou à Ilha da Baleia para recuperação acadêmica e física." },
+            { name: "Killua Zoldyck", type: "Hunter (Licenciado)", nenType: "Transformação", status: "Vivo", img: "https://i.pinimg.com/1200x/e6/b9/84/e6b98407a993d4515300afef72057aec.jpg", desc: "Ex-herdeiro da Família Zoldyck. Habilidade: Godspeed (Velocidade de Deus). Atualmente viajando pelo mundo com sua irmã Alluka Zoldyck (Entidade Classe A). Nível de perigo extremo em combate. Acesso restrito a informações de localização." },
+            { name: "Kurapika", type: "Zodíaco (Rato)", nenType: "Materialização / Especialista", status: "Vivo", img: "https://i.pinimg.com/1200x/5d/95/e0/5d95e099a3bb0668a71571bb2b836f57.jpg", desc: "Atual Zodíaco (Codinome: Rato) e Chefe da organização de inteligência da Associação. Líder da Família Nostrade. Objetivo: Recuperação dos Olhos Escarlates. Habilidade 'Emperor Time' permite 100% de eficiência em todas as categorias de Nen. Envolvido na Guerra de Sucessão de Kakin." },
+            { name: "Leorio Paradinight", type: "Zodíaco (Javali)", nenType: "Emissão", status: "Vivo", img: "https://i.pinimg.com/1200x/84/67/b3/8467b32ca404efa6382e374ab11889a4.jpg", desc: "Estudante de Medicina e Zodíaco (Codinome: Javali). Recomendado pessoalmente por Cheadle Yorkshire. Habilidade de Nen focada em ultrassom e ataques remotos (Warping Punch). Atua na equipe médica da expedição ao Continente Negro." },
+            { name: "Hisoka Morow", type: "Serial Killer (Classe S)", nenType: "Transformação", status: "Vivo", img: "https://i.pinimg.com/736x/a9/ed/46/a9ed46e1a0e1178647ffcf6e72e22793.jpg", desc: "ALERTA VERMELHO: Abordagem proibida para Hunters abaixo de 2 Estrelas. Ex-Membro da Genei Ryodan (#4). Habilidade: Bungee Gum. Responsável pelo massacre na Torre Celestial (Jan/2026). Atualmente caçando os membros restantes da Aranha." },
+            { name: "Ging Freecss", type: "Hunter de Ruínas (★★)", nenType: "Desconhecido (Mimetismo)", status: "Vivo", img: "https://i.pinimg.com/736x/f8/9a/e0/f89ae0588a54acf6422ea0213e5e40d0.jpg", desc: "Um dos 5 melhores usuários de Nen do mundo. Criador principal de Greed Island. Ex-Zodíaco. Atualmente liderando a expedição não-oficial de Beyond Netero ao Continente Negro. Especialista em copiar habilidades de percussão." },
+            { name: "Isaac Netero", type: "Ex-Presidente", nenType: "Reforço", status: "Falecido", img: "https://i.pinimg.com/1200x/fe/ac/03/feac03f69ca1e61a4512ff0eeb738067.jpg", desc: "12º Presidente da Associação Hunter. Lenda das Artes Marciais. Habilidade: Hyakushiki Kannon (Bodhisattva de 100 Tipos). Sacrificou-se detonando a bomba 'Rose' para eliminar o Rei das Formigas Quimera." },
+            { name: "Chrollo Lucilfer", type: "Líder da Genei Ryodan", nenType: "Especialista", status: "Vivo", img: "https://i.pinimg.com/736x/ae/1e/ab/ae1eab0f05f4402fd7e726abaed6d0a6.jpg", desc: "Criminoso Classe A. Líder da Aranha. Habilidade: Skill Hunter (Roubo de Habilidades). Recentemente recuperou seu Nen após exorcismo. Envolvido no roubo do navio Black Whale." },
+            { name: "Illumi Zoldyck", type: "Assassino Profissional", nenType: "Manipulação", status: "Vivo", img: "https://i.pinimg.com/1200x/58/7b/0b/587b0babdb64819efb54c93ab041e07e.jpg", desc: "Filho mais velho de Silva Zoldyck. Usa agulhas para alterar sua aparência e controlar cadáveres (Needlemen). Aliado temporário da Genei Ryodan para caçar Hisoka. Extremamente perigoso e manipulador." },
+            { name: "Biscuit Krueger", type: "Hunter de Joias (★★)", nenType: "Transformação", status: "Vivo", img: "https://i.pinimg.com/1200x/3c/5e/8f/3c5e8fbf8f91d16864fe8d9724d63dbf.jpg", desc: "Mestra do estilo Shingen-Ryu. Mentora de Wing, Gon e Killua. Possui 57 anos, mas mantém aparência de criança. Habilidade real: Transformação muscular extrema. Atuando como guarda-costas na Guerra de Sucessão." },
+            { name: "Kite", type: "Hunter de Contrato", nenType: "Materialização", status: "Renascido", img: "https://i.pinimg.com/736x/fa/63/1a/fa631a3ebeae1e750a8d7a6fa651b22d.jpg", desc: "Discípulo de Ging Freecss. Habilidade: Crazy Slots. Faleceu em combate contra Neferpitou e reencarnou como uma Formiga Quimera (Gêmeo de Meruem). Mantém memórias e personalidade humanas." },
+            { name: "Pariston Hill", type: "Ex-Vice Presidente", nenType: "Desconhecido", status: "Vivo", img: "https://i.pinimg.com/1200x/94/d7/81/94d78195c01f9304c5d31586f095f791.jpg", desc: "Hunter de Três Estrelas. Ex-Zodíaco (Rato). Renunciou imediatamente após vencer a eleição para 13º Presidente. Personalidade imprevisível e maquiavélica. Atualmente colaborando com a expedição de Beyond Netero." },
+            { name: "Feitan Portor", type: "Genei Ryodan (#2)", nenType: "Transformação", status: "Vivo", img: "https://i.pinimg.com/736x/05/a0/72/05a0726dd3fd525484f8b5e0ecc1e8d2.jpg", desc: "Líder interino da Aranha durante a ausência de Chrollo. Habilidade: Pain Packer / Rising Sun (converte dor recebida em calor abrasador). Torturador especialista. Origem: Cidade do Meteoro." },
+            { name: "Machi Komacine", type: "Genei Ryodan (#3)", nenType: "Transformação", status: "Vivo", img: "https://i.pinimg.com/1200x/07/84/be/0784bedb027c47acfb3f5eedc34685ca.jpg", desc: "Membro fundadora da Aranha. Habilidade: Nen Stitches (Fios de Nen). Possui intuição extremamente aguçada. Atua como médica de campo e rastreadora. Origem: Cidade do Meteoro." },
+            { name: "Nobunaga Hazama", type: "Genei Ryodan (#1)", nenType: "Reforço", status: "Vivo", img: "https://i.pinimg.com/1200x/42/e2/60/42e2600b7bde87c7831a449c56104b07.jpg", desc: "Membro fundador da Aranha. Espadachim mestre em Iaido. Especialista em 'En' (alcance de 4 metros). Busca vingança pela morte de Uvogin. Origem: Cidade do Meteoro." },
+            { name: "Silva Zoldyck", type: "Chefe da Família Zoldyck", nenType: "Transformação", status: "Vivo", img: "https://i.pinimg.com/1200x/36/08/e3/3608e3235652a91fe31e8d1ec4388db7.jpg", desc: "Atual patriarca da família de assassinos. Habilidade: Orbes de energia explosiva. Eliminou um membro da Genei Ryodan no passado e Cheetu (Formiga Quimera) com um único golpe." },
+            { name: "Zeno Zoldyck", type: "Assassino Profissional", nenType: "Transformação", status: "Vivo", img: "https://i.pinimg.com/1200x/f0/f2/de/f0f2dea5b7f7e058f088aca8287a2234.jpg", desc: "Avô de Killua. Mestre de Nen com décadas de experiência. Habilidade: Dragon Dive. Lema: 'Nunca aposente-se'. Contratado para separar o Rei das Formigas de sua Guarda Real." },
+            { name: "Alluka Zoldyck", type: "Entidade (Nanika)", nenType: "Especialista (Possessão)", status: "Vivo", img: "https://i.pinimg.com/736x/7d/91/a8/7d91a8e6877175426ba6354292790be7.jpg", desc: "Hospedeira de uma entidade do Continente Negro conhecida como 'Nanika'. Capacidade de conceder desejos com consequências catastróficas. Atualmente sob proteção exclusiva de Killua Zoldyck." },
+            { name: "Knuckle Bine", type: "Hunter de Bestas", nenType: "Emissão", status: "Vivo", img: "https://i.pinimg.com/736x/47/20/27/4720274cef1a720d2781750724f8ad76.jpg", desc: "Discípulo de Morel. Habilidade: A.P.R. (Potclean). Acumula juros de aura no oponente até forçá-lo ao estado de Zetsu (Falência). Personalidade compassiva, frequentemente prejudicando sua eficiência em combate letal." },
+            { name: "Morel Mackernasey", type: "Hunter do Mar (★)", nenType: "Manipulação", status: "Vivo", img: "https://i.pinimg.com/736x/d2/d2/1c/d2d21cdb229a252600e23b64e11cfecb.jpg", desc: "Usuário de cachimbo gigante. Habilidade: Deep Purple (Guerreiros de Fumaça). Possui capacidade pulmonar sobre-humana. Estrategista veterano responsável pela contenção das Formigas Quimera." },
+            { name: "Knov", type: "Hunter Profissional", nenType: "Materialização", status: "Vivo", img: "https://i.pinimg.com/736x/09/4f/e9/094fe9b2066b055c29d858e19940dea5.jpg", desc: "Habilidade: Hide and Seek (Apartamento Dimensional). Fundamental para logística e infiltração. Sofreu colapso mental ao sentir a aura de Shaiapouf, retirando-se do combate direto." },
+            { name: "Komugi", type: "Civil (Gungi)", nenType: "Reforço (Inconsciente)", status: "Falecido", img: "https://i.pinimg.com/736x/6d/92/84/6d92845f2e05a48da4ddf561538d0d7b.jpg", desc: "Campeã mundial de Gungi. Desenvolveu Nen espontaneamente durante partidas contra Meruem. Faleceu pacificamente ao lado do Rei devido ao envenenamento da bomba Rose." },
+            { name: "Uvogin", type: "Genei Ryodan (#11)", nenType: "Reforço", status: "Falecido", img: "https://i.pinimg.com/1200x/78/40/ef/7840efab17b338acc081878f127e8de8.jpg", desc: "A força física bruta da Aranha. Habilidade: Big Bang Impact. Eliminado por Kurapika em Yorknew City, servindo como primeira demonstração da 'Corrente do Julgamento'." },
+            { name: "Shizuku Murasaki", type: "Genei Ryodan (#8)", nenType: "Materialização", status: "Vivo", img: "https://i.pinimg.com/736x/70/35/b7/7035b778f50248acd4cc6c221a52c3c9.jpg", desc: "Habilidade: Blinky (Deme-chan), um aspirador que suga qualquer coisa não viva (incluindo sangue e veneno). Essencial para limpeza de cenas de crime e transporte de espólios." },
+            { name: "Phinks Magcub", type: "Genei Ryodan (#5)", nenType: "Reforço", status: "Vivo", img: "https://i.pinimg.com/736x/01/31/8c/01318c4b05c3e5c307f8fdf13b635bbf.jpg", desc: "Habilidade: Ripper Cyclotron. A força do soco aumenta quanto mais ele gira o braço. Temperamento curto, mas leal às regras da Aranha. Origem: Cidade do Meteoro." },
+            { name: "Shalnark", type: "Genei Ryodan (#6)", nenType: "Manipulação", status: "Falecido", img: "https://i.pinimg.com/1200x/b2/0c/31/b20c314dd90ab44f0d5422c1e9e77a92.jpg", desc: "O 'cérebro' da Aranha. Hunter Licenciado (usado para acesso a informações). Habilidade: Black Voice (controle via celular). Eliminado por Hisoka em um parque público após emprestar sua habilidade para Chrollo." },
+            { name: "Pakunoda", type: "Genei Ryodan (#9)", nenType: "Especialista", status: "Falecido", img: "https://i.pinimg.com/1200x/d1/c0/d7/d1c0d7074c78e270f50a8398e99e9a78.jpg", desc: "Habilidade: Leitura de Memória e Memory Bomb. Sacrificou sua vida para transmitir as memórias sobre a habilidade de Kurapika aos membros fundadores da Ryodan." },
+            { name: "Cheadle Yorkshire", type: "Presidente (14ª)", nenType: "Desconhecido", status: "Vivo", img: "https://i.pinimg.com/1200x/08/09/81/08098183c2c0ffaf3539f41bdfc9ac6f.jpg", desc: "Atual Presidente da Associação Hunter. Hunter de Doenças (Três Estrelas). Zodíaco (Cão). Advogada e médica. Focada em reformar a política interna e gerenciar a crise do Continente Negro." },
+            { name: "Satotz", type: "Hunter de Ruínas", nenType: "Desconhecido", status: "Vivo", img: "https://i.pinimg.com/1200x/2d/18/73/2d1873a161450e7465b2c5c3bb964ba6.jpg", desc: "Examinador da 1ª Fase do Exame Hunter. Conhecido por sua resistência infinita e passo silencioso. Grande admirador do trabalho de Ging Freecss na restauração de ruínas." },
+            { name: "Pokkle", type: "Hunter de Bestas", nenType: "Emissão", status: "Falecido", img: "https://i.pinimg.com/1200x/a8/f0/88/a8f0884f846e4880edbd9987c8abf649.jpg", desc: "Habilidade: Rainbow Arrow. Capturado pelas Formigas Quimera em NGL. Teve seu cérebro dissecado por Neferpitou para ensinar sobre Nen às formigas. Status: Confirmado morto." },
+            { name: "Hanzo", type: "Hunter (Ninja)", nenType: "Desconhecido", status: "Vivo", img: "https://i.pinimg.com/736x/0f/87/c3/0f87c371a6c16d535ed2cff17ebfb9e7.jpg", desc: "Ninja Jounin do clã Cloud-Hidden. Treinamento extremo desde a infância. Atualmente servindo como guarda-costas principal do Príncipe Momoze na Guerra de Sucessão." },
+            { name: "Menchi", type: "Hunter Gourmet (★)", nenType: "Desconhecido", status: "Vivo", img: "https://i.pinimg.com/736x/8e/a0/cc/8ea0cc7df1b5a0940712f02ead463406.jpg", desc: "Uma das maiores autoridades culinárias do mundo. Examinadora da 2ª Fase. Temperamento volátil. Especialista em ingredientes raros e perigosos." },
+            { name: "Neon Nostrade", type: "Civil", nenType: "Especialista", status: "Vivo", img: "https://i.pinimg.com/736x/c9/a6/86/c9a686892edc5efcbd7d5d9dd743213c.jpg", desc: "Filha de Light Nostrade. Ex-usuária da habilidade 'Lovely Ghostwriter' (Profecias automáticas). Teve sua habilidade roubada por Chrollo Lucilfer, levando ao declínio da família." },
+            { name: "Ponzu", type: "Candidata a Hunter", nenType: "Manipulação", status: "Falecido", img: "https://i.pinimg.com/736x/a1/4b/8e/a14b8e896c0b916598d61e93736fc6b8.jpg", desc: "Usuária de abelhas químicas. Reprovada no Exame 287 e 288. Eliminada por um oficial Formiga Quimera em NGL enquanto tentava enviar um aviso à Associação." },
+            { name: "Franklin Bordeau", type: "Genei Ryodan (#7)", nenType: "Emissão", status: "Vivo", img: "https://i.pinimg.com/1200x/bb/7f/8f/bb7f8f596f336beac3eccab785d95dd3.jpg", desc: "Habilidade: Double Machine Gun. Cortou as pontas dos próprios dedos para aumentar a potência dos tiros de Nen. Atua frequentemente como pacificador nas disputas internas da Aranha." },
+            { name: "Kortopi", type: "Genei Ryodan (#12)", nenType: "Materialização", status: "Falecido", img: "https://i.pinimg.com/736x/59/ad/e6/59ade61269bb4b1b3868bc78de44efef.jpg", desc: "Habilidade: Gallery Fake. Podia copiar 50 prédios em um dia. Fisicamente o membro mais fraco. Decapitado por Hisoka em um banheiro público." },
+            { name: "Bonolenov Ndongo", type: "Genei Ryodan (#10)", nenType: "Materialização", status: "Vivo", img: "https://i.pinimg.com/1200x/55/37/44/553744b013a4c503c910788872bb13d9.jpg", desc: "Guerreiro da tribo Gyudondond. Possui buracos no corpo que criam música ao se mover. Habilidade: Battle Cantabile (Júpiter). Transforma som em esferas destrutivas." },
+            { name: "Tonpa", type: "Candidato Eterno", nenType: "Nenhum", status: "Vivo", img: "https://i.pinimg.com/1200x/e5/42/27/e54227e44847e5501576d6b17d8d95d1.jpg", desc: "O 'Esmagador de Novatos'. Veterano com mais de 30 tentativas no Exame Hunter. Especialista em sabotagem psicológica e sucos laxantes. Não possui interesse real em se tornar Hunter." },
+            { name: "Milluki Zoldyck", type: "Assassino / Hacker", nenType: "Manipulação", status: "Vivo", img: "https://i.pinimg.com/736x/ec/d5/9c/ecd59cfa27936950c0a5df054e298992.jpg", desc: "Segundo filho da Família Zoldyck. Gênio da computação e inventor. Raramente deixa a mansão. Responsável pela tortura e treinamento de Killua no passado." },
+            { name: "Melody", type: "Hunter de Música", nenType: "Emissão", status: "Vivo", img: "https://i.pinimg.com/736x/5c/8b/90/5c8b9093f2486c8d54ee4b147e7c9bd8.jpg", desc: "Possui audição sobrenatural. Teve o corpo deformado ao ouvir um trecho da 'Sonata das Trevas'. Busca destruir a partitura original. Guarda-costas leal de Kurapika." },
+            { name: "Zushi", type: "Lutador da Arena", nenType: "Manipulação", status: "Vivo", img: "https://i.pinimg.com/736x/f8/aa/99/f8aa99572972b2fdd0dd98d207173e25.jpg", desc: "Discípulo de Wing. Praticante dedicado do estilo Shingen-Ryu. Embora aprenda mais devagar que Gon e Killua, possui uma base sólida e determinação inabalável." },
+            { name: "Wing", type: "Mestre Shingen-Ryu", nenType: "Reforço", status: "Vivo", img: "https://i.pinimg.com/1200x/b2/82/ef/b282ef5f92550c6b941304b67aa16105.jpg", desc: "Discípulo de Biscuit Krueger. Mentor de Gon e Killua na Torre Celestial. Responsável por ensinar-lhes os fundamentos do Nen. Aparência desleixada, mas mestre competente." },
+            { name: "Shoot McMahon", type: "Hunter de Bestas", nenType: "Manipulação", status: "Vivo", img: "https://i.pinimg.com/736x/1a/3c/56/1a3c56b5dd0eabc7e1d9c3e773299ee0.jpg", desc: "Discípulo de Morel. Habilidade: Hotel Rafflesia (Gaiola Flutuante). Tímido e reservado, superou seus medos durante a invasão ao palácio. Perdeu uma perna em combate contra Youpi." },
+            { name: "Palm Siberia", type: "Hunter / Soldado", nenType: "Reforço", status: "Vivo", img: "https://i.pinimg.com/736x/b7/c8/71/b7c8716709975a8477672d42a0d89c52.jpg", desc: "Discípula de Knov. Transformada em soldado experimental pelas Formigas Quimera. Habilidade: Black Widow (Armadura de Cabelo). Mantém sua lealdade à humanidade." },
+            { name: "Amane", type: "Mordomo Zoldyck", nenType: "Desconhecido", status: "Vivo", img: "https://i.pinimg.com/736x/a3/c0/8d/a3c08d5f444f6f995a7f6ec1cbde5ebc.jpg", desc: "Neta de Tsubone. Designada para acompanhar Killua e Alluka durante a fuga. Extremamente formal e leal às ordens da família." },
+            { name: "Kalluto Zoldyck", type: "Genei Ryodan (#4)", nenType: "Manipulação", status: "Vivo", img: "https://i.pinimg.com/736x/1c/f5/15/1cf515497c343248cd8545ab762f31c9.jpg", desc: "Membro mais jovem da Família Zoldyck. Juntou-se à Ryodan para substituir Hisoka e 'trazer seu irmão de volta'. Habilidade: Manipulação de papel e vigilância." },
+            { name: "Kikyo Zoldyck", type: "Matriarca Zoldyck", nenType: "Manipulação", status: "Vivo", img: "https://i.pinimg.com/736x/7a/d3/2f/7ad32fd3c48a61b524761f2639669987.jpg", desc: "Esposa de Silva. Instável e superprotetora, especialmente com Killua. Usa um visor eletrônico devido a ferimentos causados pelo filho. Origem: Cidade do Meteoro." },
+            { name: "Gotoh", type: "Mordomo Chefe", nenType: "Reforço", status: "Falecido", img: "https://i.pinimg.com/1200x/a7/4c/97/a74c9763560de7f09e81c9da0c52f8e9.jpg", desc: "Guardião leal de Killua. Usava moedas como balas mortais. Eliminado por Hisoka em uma emboscada na floresta para proteger a fuga de Killua." },
+            { name: "Tsezguerra", type: "Hunter (★)", nenType: "Desconhecido", status: "Vivo", img: "https://i.pinimg.com/736x/d7/3f/af/d73faf6ccb9a5174c1dd3c76d681aac7.jpg", desc: "Hunter de Uma Estrela. Jogador veterano de Greed Island. Liderou a equipe contratada por Battera. Especialista em combate tático e defensivo." },
+            { name: "Basho", type: "Hunter", nenType: "Materialização", status: "Vivo", img: "https://i.pinimg.com/736x/d8/7b/a6/d87ba6e966218b5001940a8b5f1308b7.jpg", desc: "Poeta de Haiku. Habilidade: Great Haiku. O que ele escreve em um haiku torna-se realidade (ex: 'meu punho queima'). Guarda-costas do Príncipe Luzurus." },
+            { name: "Kanzai", type: "Zodíaco (Tigre)", nenType: "Reforço", status: "Vivo", img: "https://i.pinimg.com/1200x/23/89/1e/23891e126729925383243063a4d619e3.jpg", desc: "Hunter de Tesouros. Impulsivo e agressivo, frequentemente entra em conflito com outros Zodíacos. Parte da equipe de defesa da viagem ao Continente Negro." },
+            { name: "Saiyu", type: "Zodíaco (Macaco)", nenType: "Materialização", status: "Vivo", img: "https://i.pinimg.com/736x/cd/e9/28/cde92884a54f5ed93236478c883b101d.jpg", desc: "Hunter de Lista Negra. Artista marcial que usa um bastão que muda de tamanho. Suspeito de ser o traidor infiltrado por Pariston na Associação." },
+            { name: "Botobai Gigante", type: "Zodíaco (Dragão)", nenType: "Desconhecido", status: "Vivo", img: "https://i.pinimg.com/1200x/d7/63/3b/d7633bae834ac5b219e2c3f83857a8e4.jpg", desc: "Hunter de Terroristas (Três Estrelas). Membro mais antigo dos Zodíacos e o mais próximo de Netero em termos de poder e experiência militar." },
+            { name: "Ginta", type: "Zodíaco (Ovelha)", nenType: "Desconhecido", status: "Vivo", img: "https://i.pinimg.com/736x/6c/2b/fc/6c2bfc4a7b15b9456b7aec90bcf39791.jpg", desc: "Hunter de Caça Furtiva. Possui grande força física e velocidade surpreendente para seu tamanho. Emocionou-se profundamente com a morte de Netero." },
+            { name: "Sacco", type: "Zodíaco (Cavalo)", nenType: "Desconhecido", status: "Vivo", img: "https://i.pinimg.com/736x/6c/2b/fc/6c2bfc4a7b15b9456b7aec90bcf39791.jpg", desc: "Hunter de Problemas. Analítico e calmo. Responsável pela gestão de crises diplomáticas da Associação." },
+            { name: "Tsubone", type: "Mordomo Veterana", nenType: "Materialização", status: "Vivo", img: "https://i.pinimg.com/736x/eb/73/0a/eb730a8305e954e1dd16b6d95d92c14e.jpg", desc: "A única pessoa que Killua teme além de sua mãe. Habilidade: Rider's High. Transforma-se em veículos que usam a aura do piloto como combustível." },
+            { name: "Geru", type: "Zodíaco (Cobra)", nenType: "Desconhecido", status: "Vivo", img: "https://i.pinimg.com/736x/0f/ff/f1/0ffff129877ca742e1127f179abec947.jpg", desc: "Hunter de Venenos. Farmacêutica e química especialista. Consegue transformar seus braços em serpentes venenosas." },
+            { name: "Piyon", type: "Zodíaco (Coelho)", nenType: "Desconhecido", status: "Vivo", img: "https://i.pinimg.com/736x/bb/b6/31/bbb631b59cd3c7b148f83ebd4030982f.jpg", desc: "Hunter de Paleografia. Especialista em línguas antigas e tecnologia. Responsável pela modernização dos sistemas da Associação." },
+            { name: "Cluck", type: "Zodíaco (Galinha)", nenType: "Manipulação", status: "Vivo", img: "https://i.pinimg.com/736x/73/ab/88/73ab88f9bbe2db83698dbfed193e99ec.jpg", desc: "Hunter de Plantas. Mestra em botânica. Habilidade de controlar pássaros para transmitir mensagens e vigilância." },
+            { name: "Razor", type: "Mestre de Jogo (GI)", nenType: "Emissão", status: "Vivo", img: "https://i.pinimg.com/736x/d4/93/49/d49349304362a65e466121a58027ccb5.jpg", desc: "Responsável pelos sistemas emissivos de Greed Island. Ex-criminoso condenado à morte, recrutado por Ging. Sua força é comparável à de membros da Ryodan." },
+            { name: "Kastro", type: "Lutador da Arena", nenType: "Reforço", status: "Falecido", img: "https://i.pinimg.com/736x/e6/02/60/e602609501ffb93444561e422b0bbbfa.jpg", desc: "Lutador talentoso que 'desperdiçou' sua memória criando um clone (Doppelganger), uma habilidade incompatível com seu tipo. Eliminado por Hisoka." },
+            { name: "Elena", type: "Mestre de Jogo (GI)", nenType: "Desconhecido", status: "Vivo", img: "https://i.pinimg.com/736x/4c/f1/be/4cf1be761ee6a81b1a888822319b23b9.jpg", desc: "Irmã gêmea de Eeta. Responsável pela saída do jogo Greed Island. O 'E' de GREED." },
+            { name: "Dwun", type: "Mestre de Jogo (GI)", nenType: "Desconhecido", status: "Vivo", img: "https://i.pinimg.com/736x/79/2e/36/792e368c158df098867eebcb0806cae1.jpg", desc: "O 'D' de GREED. Vive no quarto do castelo em Limeiro. Ging mudou o nome dele de Wdwune para Dwun apenas para a sigla do jogo funcionar." },
+            { name: "List", type: "Mestre de Jogo (GI)", nenType: "Desconhecido", status: "Vivo", img: "https://i.pinimg.com/736x/10/a7/23/10a72398151b72a6576554351551fa77.jpg", desc: "O 'L' de GREED. Responsável pela administração do castelo e explicações aos jogadores que completam o jogo." },
+            { name: "Leroute", type: "Prisioneira", nenType: "Desconhecido", status: "Vivo", img: "https://i.pinimg.com/1200x/06/c0/b5/06c0b5d809cbee92b71434f8cf962735.jpg", desc: "Prisioneira da Torre dos Truques. Especialista em psicologia e jogos mentais. Cumpriu pena de 112 anos por tráfico de animais exóticos e jogos de azar ilegais." },
+            { name: "Mito Freecss", type: "Civil", nenType: "Nenhum", status: "Vivo", img: "https://i.pinimg.com/1200x/85/01/d2/8501d2328690d82c0c78fa60d66ad485.jpg", desc: "Prima de Ging e mãe adotiva de Gon. Proprietária de um bar na Ilha da Baleia. Detém a custódia legal de Gon após ganhar na justiça contra Ging." },
+            { name: "Canary", type: "Aprendiz de Mordomo", nenType: "Desconhecido", status: "Vivo", img: "https://i.pinimg.com/736x/e5/ec/ae/e5ecae5068928f699fb94fcfa30224bd.jpg", desc: "Guardiã da propriedade Zoldyck. Usa um bastão como arma. Derrotou 100 caçadores de recompensa sozinha. Leal a Killua." },
+            { name: "Asuta", type: "Hunter", nenType: "Desconhecido", status: "Vivo", img: "https://i.pinimg.com/736x/2f/84/cd/2f84cdb662ea5b98da48c1aaf1aecf75.jpg", desc: "Registro Hunter incompleto. Dados em processamento pelo sistema." },
+            { name: "Jispa", type: "Hunter", nenType: "Desconhecido", status: "Vivo", img: "https://i.pinimg.com/1200x/17/bf/89/17bf89c48bb6be3fc3747f314bbb7c41.jpg", desc: "Registro Hunter incompleto. Dados em processamento pelo sistema." },
+            { name: "Maha Zoldyck", type: "Assassino Lendário", nenType: "Reforço", status: "Vivo", img: "https://i.pinimg.com/736x/10/48/e7/1048e717fc31267ad30cecfdf51bdb64.jpg", desc: "Membro mais antigo da Família Zoldyck. Avô de Zeno. O único que lutou com Netero no auge e sobreviveu. Sua força atual é desconhecida." },
+            { name: "Zigg Zoldyck", type: "Explorador", nenType: "Desconhecido", status: "Desconhecido", img: "https://i.pinimg.com/736x/89/de/db/89dedbdbd687cba4c657fa203fa762fa.jpg", desc: "Lenda da Família Zoldyck. Participou da expedição não oficial ao Continente Negro com Netero. Status atual e paradeiro são mistérios absolutos." }
+            { name: "Kurokawa Akin Min", rank: "Rank D", type: "Hunter Novato", nenType: "(confidencial)", status: "Vivo", img: "https://media.discordapp.net/attachments/1456713520413675804/1460078727642878015/file_0000000073ec71f5ab9f2ed8934c9d64.png?ex=6987e2c7&is=69869147&hm=21249bc9e1ddb118c1c9c347aa63a89ba111ff826c93265a4ba4f31fc26cef58&=&format=webp&quality=lossless&width=656&height=656", desc: "Caçador recém-formado da 289ª Turma. Sobrevivente à invasão durante o Exame Hunter. Atualmente em fase de treinamento básico de Nen. Potencial monitorado pela Associação." },
+            { name: "Kageshiro Kuruta", rank: "Rank D", type: "Hunter Novato", nenType: "(confidencial)", status: "Vivo", img: "https://media.discordapp.net/attachments/1456713520413675804/1460080250749845504/1767759806552.jpg?ex=6987e432&is=698692b2&hm=6a7664fe9902cca4f4c3533fa89f7d06c97b64d565b7c45f35d88f2a45aed17c&=&format=webp&width=375&height=656", desc: "Sobrevivente do Clã Kuruta. Caçador recém-formado. Demonstra alta aptidão para combate tático. Motivação primária: Recuperação de artefatos culturais perdidos." },
+            { name: "Agnes Morrígan Zoldyck", rank: "Rank D", type: "Hunter Novato", nenType: "(confidencial)", status: "Vivo", img: "https://media.discordapp.net/attachments/1456713520413675804/1460079404226052106/1767762588568.jpg?ex=6987e368&is=698691e8&hm=0105656312d8058f570226d02445690efd92e5ff65c175c243690cd8bbc3c692&=&format=webp&width=510&height=656", desc: "Membro afastado da Família Zoldyck. Caçadora recém-formada. Especialista em técnicas de assassinato silencioso adaptadas para missões de caça. Perfil psicológico estável, mas letal." },
+            { name: "Melissa Ackerman", rank: "Rank D", type: "Hunter Novato", nenType: "(confidencial)", status: "Vivo", img: "https://media.discordapp.net/attachments/1456713520413675804/1460078117778362612/WhatsApp_Image_2026-01-11_at_19.14.38.jpeg?ex=6987e236&is=698690b6&hm=6ea9b18882fece5aae729c5eca111734bdb84003f729ea797bbbd9b87fe01392&=&format=webp&width=656&height=656", desc: "Caçadora recém-formada. Origem: Cidade do Meteoro. Demonstra força física acima da média e lealdade extrema aos seus aliados. Sobrevivente da invasão ao Exame." },
+            { name: "Morana Ravenscar", rank: "Rank D", type: "Hunter Novato", nenType: "(confidencial)", status: "Vivo", img: "https://media.discordapp.net/attachments/1456713520413675804/1460083643182616639/ChatGPT_Image_7_de_jan._de_2026_11_53_05.png?ex=6988901b&is=69873e9b&hm=79425292638e6c88404a6895858323ecd642f0ded109754a67dded8bf50c0aa1&=&format=webp&quality=lossless&width=437&height=656", desc: "Caçadora recém-formada. Origem nobre britânica. Especialista em ocultismo e história antiga. Perfil analítico com alto potencial estratégico." },
+            { name: "Gon Freecss", type: "Hunter (Licenciado)", nenType: "(confidencial)", status: "Vivo", img: "https://i.pinimg.com/1200x/45/87/1a/45871a387861ca0b7517fc836da84a31.jpg", desc: "Filho de Ging Freecss. Primeiro humano a completar o jogo Greed Island. Relatório de Incidente: Utilizou um Voto e Restrição de nível calamidade para neutralizar Neferpitou. Atualmente sem acesso ao Nen (Canais fechados). Retornou à Ilha da Baleia para recuperação acadêmica e física." },
+            { name: "Killua Zoldyck", type: "Hunter (Licenciado)", nenType: "(confidencial)", status: "Vivo", img: "https://i.pinimg.com/1200x/e6/b9/84/e6b98407a993d4515300afef72057aec.jpg", desc: "Ex-herdeiro da Família Zoldyck. Habilidade: Godspeed (Velocidade de Deus). Atualmente viajando pelo mundo com sua irmã Alluka Zoldyck (Entidade Classe A). Nível de perigo extremo em combate. Acesso restrito a informações de localização." },
+            { name: "Kurapika", type: "Zodíaco (Rato)", nenType: "(confidencial)", status: "Vivo", img: "https://i.pinimg.com/1200x/5d/95/e0/5d95e099a3bb0668a71571bb2b836f57.jpg", desc: "Atual Zodíaco (Codinome: Rato) e Chefe da organização de inteligência da Associação. Líder da Família Nostrade. Objetivo: Recuperação dos Olhos Escarlates. Habilidade 'Emperor Time' permite 100% de eficiência em todas as categorias de Nen. Envolvido na Guerra de Sucessão de Kakin." },
+            { name: "Leorio Paradinight", type: "Zodíaco (Javali)", nenType: "(confidencial)", status: "Vivo", img: "https://i.pinimg.com/1200x/84/67/b3/8467b32ca404efa6382e374ab11889a4.jpg", desc: "Estudante de Medicina e Zodíaco (Codinome: Javali). Recomendado pessoalmente por Cheadle Yorkshire. Habilidade de Nen focada em ultrassom e ataques remotos (Warping Punch). Atua na equipe médica da expedição ao Continente Negro." },
+            { name: "Hisoka Morow", type: "Serial Killer (Classe S)", nenType: "(confidencial)", status: "Vivo", img: "https://i.pinimg.com/736x/a9/ed/46/a9ed46e1a0e1178647ffcf6e72e22793.jpg", desc: "ALERTA VERMELHO: Abordagem proibida para Hunters abaixo de 2 Estrelas. Ex-Membro da Genei Ryodan (#4). Habilidade: Bungee Gum. Responsável pelo massacre na Torre Celestial (Jan/2026). Atualmente caçando os membros restantes da Aranha." },
+            { name: "Ging Freecss", type: "Hunter de Ruínas (★★)", nenType: "(confidencial)", status: "Vivo", img: "https://i.pinimg.com/736x/f8/9a/e0/f89ae0588a54acf6422ea0213e5e40d0.jpg", desc: "Um dos 5 melhores usuários de Nen do mundo. Criador principal de Greed Island. Ex-Zodíaco. Atualmente liderando a expedição não-oficial de Beyond Netero ao Continente Negro. Especialista em copiar habilidades de percussão." },
+            { name: "Isaac Netero", type: "Ex-Presidente", nenType: "(confidencial)", status: "Falecido", img: "https://i.pinimg.com/1200x/fe/ac/03/feac03f69ca1e61a4512ff0eeb738067.jpg", desc: "12º Presidente da Associação Hunter. Lenda das Artes Marciais. Habilidade: Hyakushiki Kannon (Bodhisattva de 100 Tipos). Sacrificou-se detonando a bomba 'Rose' para eliminar o Rei das Formigas Quimera." },
+            { name: "Chrollo Lucilfer", type: "Líder da Genei Ryodan", nenType: "(confidencial)", status: "Vivo", img: "https://i.pinimg.com/736x/ae/1e/ab/ae1eab0f05f4402fd7e726abaed6d0a6.jpg", desc: "Criminoso Classe A. Líder da Aranha. Habilidade: Skill Hunter (Roubo de Habilidades). Recentemente recuperou seu Nen após exorcismo. Envolvido no roubo do navio Black Whale." },
+            { name: "Illumi Zoldyck", type: "Assassino Profissional", nenType: "(confidencial)", status: "Vivo", img: "https://i.pinimg.com/1200x/58/7b/0b/587b0babdb64819efb54c93ab041e07e.jpg", desc: "Filho mais velho de Silva Zoldyck. Usa agulhas para alterar sua aparência e controlar cadáveres (Needlemen). Aliado temporário da Genei Ryodan para caçar Hisoka. Extremamente perigoso e manipulador." },
+            { name: "Biscuit Krueger", type: "Hunter de Joias (★★)", nenType: "(confidencial)", status: "Vivo", img: "https://i.pinimg.com/1200x/3c/5e/8f/3c5e8fbf8f91d16864fe8d9724d63dbf.jpg", desc: "Mestra do estilo Shingen-Ryu. Mentora de Wing, Gon e Killua. Possui 57 anos, mas mantém aparência de criança. Habilidade real: Transformação muscular extrema. Atuando como guarda-costas na Guerra de Sucessão." },
+            { name: "Kite", type: "Hunter de Contrato", nenType: "(confidencial)", status: "Renascido", img: "https://i.pinimg.com/736x/fa/63/1a/fa631a3ebeae1e750a8d7a6fa651b22d.jpg", desc: "Discípulo de Ging Freecss. Habilidade: Crazy Slots. Faleceu em combate contra Neferpitou e reencarnou como uma Formiga Quimera (Gêmeo de Meruem). Mantém memórias e personalidade humanas." },
+            { name: "Pariston Hill", type: "Ex-Vice Presidente", nenType: "(confidencial)", status: "Vivo", img: "https://i.pinimg.com/1200x/94/d7/81/94d78195c01f9304c5d31586f095f791.jpg", desc: "Hunter de Três Estrelas. Ex-Zodíaco (Rato). Renunciou imediatamente após vencer a eleição para 13º Presidente. Personalidade imprevisível e maquiavélica. Atualmente colaborando com a expedição de Beyond Netero." },
+            { name: "Feitan Portor", type: "Genei Ryodan (#2)", nenType: "(confidencial)", status: "Vivo", img: "https://i.pinimg.com/736x/05/a0/72/05a0726dd3fd525484f8b5e0ecc1e8d2.jpg", desc: "Líder interino da Aranha durante a ausência de Chrollo. Habilidade: Pain Packer / Rising Sun (converte dor recebida em calor abrasador). Torturador especialista. Origem: Cidade do Meteoro." },
+            { name: "Machi Komacine", type: "Genei Ryodan (#3)", nenType: "(confidencial)", status: "Vivo", img: "https://i.pinimg.com/1200x/07/84/be/0784bedb027c4447acfb3f5eedc34685ca.jpg", desc: "Membro fundadora da Aranha. Habilidade: Nen Stitches (Fios de Nen). Possui intuição extremamente aguçada. Atua como médica de campo e rastreadora. Origem: Cidade do Meteoro." },
+            { name: "Nobunaga Hazama", type: "Genei Ryodan (#1)", nenType: "(confidencial)", status: "Vivo", img: "https://i.pinimg.com/1200x/42/e2/60/42e2600b7bde87c7831a449c56104b07.jpg", desc: "Membro fundador da Aranha. Espadachim mestre em Iaido. Especialista em 'En' (alcance de 4 metros). Busca vingança pela morte de Uvogin. Origem: Cidade do Meteoro." },
+            { name: "Silva Zoldyck", type: "Chefe da Família Zoldyck", nenType: "(confidencial)", status: "Vivo", img: "https://i.pinimg.com/1200x/36/08/e3/3608e3235652a91fe31e8d1ec4388db7.jpg", desc: "Atual patriarca da família de assassinos. Habilidade: Orbes de energia explosiva. Eliminou um membro da Genei Ryodan no passado e Cheetu (Formiga Quimera) com um único golpe." },
+            { name: "Zeno Zoldyck", type: "Assassino Profissional", nenType: "(confidencial)", status: "Vivo", img: "https://i.pinimg.com/1200x/f0/f2/de/f0f2dea5b7f7e058f088aca8287a2234.jpg", desc: "Avô de Killua. Mestre de Nen com décadas de experiência. Habilidade: Dragon Dive. Lema: 'Nunca aposente-se'. Contratado para separar o Rei das Formigas de sua Guarda Real." },
+            { name: "Alluka Zoldyck", type: "Entidade (Nanika)", nenType: "(confidencial)", status: "Vivo", img: "https://i.pinimg.com/736x/7d/91/a8/7d91a8e6877175426ba6354292790be7.jpg", desc: "Hospedeira de uma entidade do Continente Negro conhecida como 'Nanika'. Capacidade de conceder desejos com consequências catastróficas. Atualmente sob proteção exclusiva de Killua Zoldyck." },
+            { name: "Knuckle Bine", type: "Hunter de Bestas", nenType: "(confidencial)", status: "Vivo", img: "https://i.pinimg.com/736x/47/20/27/4720274cef1a720d2781750724f8ad76.jpg", desc: "Discípulo de Morel. Habilidade: A.P.R. (Potclean). Acumula juros de aura no oponente até forçá-lo ao estado de Zetsu (Falência). Personalidade compassiva, frequentemente prejudicando sua eficiência em combate letal." },
+            { name: "Morel Mackernasey", type: "Hunter do Mar (★)", nenType: "(confidencial)", status: "Vivo", img: "https://i.pinimg.com/736x/d2/d2/1c/d2d21cdb229a252600e23b64e11cfecb.jpg", desc: "Usuário de cachimbo gigante. Habilidade: Deep Purple (Guerreiros de Fumaça). Possui capacidade pulmonar sobre-humana. Estrategista veterano responsável pela contenção das Formigas Quimera." },
+            { name: "Knov", type: "Hunter Profissional", nenType: "(confidencial)", status: "Vivo", img: "https://i.pinimg.com/736x/09/4f/e9/094fe9b2066b055c29d858e19940dea5.jpg", desc: "Habilidade: Hide and Seek (Apartamento Dimensional). Fundamental para logística e infiltração. Sofreu colapso mental ao sentir a aura de Shaiapouf, retirando-se do combate direto." },
+            { name: "Komugi", type: "Civil (Gungi)", nenType: "(confidencial)", status: "Falecido", img: "https://i.pinimg.com/736x/6d/92/84/6d92845f2e05a48da4ddf561538d0d7b.jpg", desc: "Campeã mundial de Gungi. Desenvolveu Nen espontaneamente durante partidas contra Meruem. Faleceu pacificamente ao lado do Rei devido ao envenenamento da bomba Rose." },
+            { name: "Uvogin", type: "Genei Ryodan (#11)", nenType: "(confidencial)", status: "Falecido", img: "https://i.pinimg.com/1200x/78/40/ef/7840efab17b338acc081878f127e8de8.jpg", desc: "A força física bruta da Aranha. Habilidade: Big Bang Impact. Eliminado por Kurapika em Yorknew City, servindo como primeira demonstração da 'Corrente do Julgamento'." },
+            { name: "Shizuku Murasaki", type: "Genei Ryodan (#8)", nenType: "(confidencial)", status: "Vivo", img: "https://i.pinimg.com/736x/70/35/b7/7035b778f50248acd4cc6c221a52c3c9.jpg", desc: "Habilidade: Blinky (Deme-chan), um aspirador que suga qualquer coisa não viva (incluindo sangue e veneno). Essencial para limpeza de cenas de crime e transporte de espólios." },
+            { name: "Phinks Magcub", type: "Genei Ryodan (#5)", nenType: "(confidencial)", status: "Vivo", img: "https://i.pinimg.com/736x/01/31/8c/01318c4b05c3e5c307f8fdf13b635bbf.jpg", desc: "Habilidade: Ripper Cyclotron. A força do soco aumenta quanto mais ele gira o braço. Temperamento curto, mas leal às regras da Aranha. Origem: Cidade do Meteoro." },
+            { name: "Shalnark", type: "Genei Ryodan (#6)", nenType: "(confidencial)", status: "Falecido", img: "https://i.pinimg.com/1200x/b2/0c/31/b20c314dd90ab44f0d5422c1e9e77a92.jpg", desc: "O 'cérebro' da Aranha. Hunter Licenciado (usado para acesso a informações). Habilidade: Black Voice (controle via celular). Eliminado por Hisoka em um parque público após emprestar sua habilidade para Chrollo." },
+            { name: "Pakunoda", type: "Genei Ryodan (#9)", nenType: "(confidencial)", status: "Falecido", img: "https://i.pinimg.com/1200x/d1/c0/d7/d1c0d7074c78e270f50a8398e99e9a78.jpg", desc: "Habilidade: Leitura de Memória e Memory Bomb. Sacrificou sua vida para transmitir as memórias sobre a habilidade de Kurapika aos membros fundadores da Ryodan." },
+            { name: "Cheadle Yorkshire", type: "Presidente (14ª)", nenType: "(confidencial)", status: "Vivo", img: "https://i.pinimg.com/1200x/08/09/81/08098183c2c0ffaf3539f41bdfc9ac6f.jpg", desc: "Atual Presidente da Associação Hunter. Hunter de Doenças (Três Estrelas). Zodíaco (Cão). Advogada e médica. Focada em reformar a política interna e gerenciar a crise do Continente Negro." },
+            { name: "Satotz", type: "Hunter de Ruínas", nenType: "(confidencial)", status: "Vivo", img: "https://i.pinimg.com/1200x/2d/18/73/2d1873a161450e7465b2c5c3bb964ba6.jpg", desc: "Examinador da 1ª Fase do Exame Hunter. Conhecido por sua resistência infinita e passo silencioso. Grande admirador do trabalho de Ging Freecss na restauração de ruínas." },
+            { name: "Pokkle", type: "Hunter de Bestas", nenType: "(confidencial)", status: "Falecido", img: "https://i.pinimg.com/1200x/a8/f0/88/a8f0884f846e4880edbd9987c8abf649.jpg", desc: "Habilidade: Rainbow Arrow. Capturado pelas Formigas Quimera em NGL. Teve seu cérebro dissecado por Neferpitou para ensinar sobre Nen às formigas. Status: Confirmado morto." },
+            { name: "Hanzo", type: "Hunter (Ninja)", nenType: "(confidencial)", status: "Vivo", img: "https://i.pinimg.com/736x/0f/87/c3/0f87c371a6c16d535ed2cff17ebfb9e7.jpg", desc: "Ninja Jounin do clã Cloud-Hidden. Treinamento extremo desde a infância. Atualmente servindo como guarda-costas principal do Príncipe Momoze na Guerra de Sucessão." },
+            { name: "Menchi", type: "Hunter Gourmet (★)", nenType: "(confidencial)", status: "Vivo", img: "https://i.pinimg.com/736x/8e/a0/cc/8ea0cc7df1b5a0940712f02ead463406.jpg", desc: "Uma das maiores autoridades culinárias do mundo. Examinadora da 2ª Fase. Temperamento volátil. Especialista em ingredientes raros e perigosos." },
+            { name: "Neon Nostrade", type: "Civil", nenType: "(confidencial)", status: "Vivo", img: "https://i.pinimg.com/736x/c9/a6/86/c9a686892edc5efcbd7d5d9dd743213c.jpg", desc: "Filha de Light Nostrade. Ex-usuária da habilidade 'Lovely Ghostwriter' (Profecias automáticas). Teve sua habilidade roubada por Chrollo Lucilfer, levando ao declínio da família." },
+            { name: "Ponzu", type: "Candidata a Hunter", nenType: "(confidencial)", status: "Falecido", img: "https://i.pinimg.com/736x/a1/4b/8e/a14b8e896c0b916598d61e93736fc6b8.jpg", desc: "Usuária de abelhas químicas. Reprovada no Exame 287 e 288. Eliminada por um oficial Formiga Quimera em NGL enquanto tentava enviar um aviso à Associação." },
+            { name: "Franklin Bordeau", type: "Genei Ryodan (#7)", nenType: "(confidencial)", status: "Vivo", img: "https://i.pinimg.com/1200x/bb/7f/8f/bb7f8f596f336beac3eccab785d95dd3.jpg", desc: "Habilidade: Double Machine Gun. Cortou as pontas dos próprios dedos para aumentar a potência dos tiros de Nen. Atua frequentemente como pacificador nas disputas internas da Aranha." },
+            { name: "Kortopi", type: "Genei Ryodan (#12)", nenType: "(confidencial)", status: "Falecido", img: "https://i.pinimg.com/736x/59/ad/e6/59ade61269bb4b1b3868bc78de44efef.jpg", desc: "Habilidade: Gallery Fake. Podia copiar 50 prédios em um dia. Fisicamente o membro mais fraco. Decapitado por Hisoka em um banheiro público." },
+            { name: "Bonolenov Ndongo", type: "Genei Ryodan (#10)", nenType: "(confidencial)", status: "Vivo", img: "https://i.pinimg.com/1200x/55/37/44/553744b013a4c503c910788872bb13d9.jpg", desc: "Guerreiro da tribo Gyudondond. Possui buracos no corpo que criam música ao se mover. Habilidade: Battle Cantabile (Júpiter). Transforma som em esferas destrutivas." },
+            { name: "Tonpa", type: "Candidato Eterno", nenType: "(confidencial)", status: "Vivo", img: "https://i.pinimg.com/1200x/e5/42/27/e54227e44847e5501576d6b17d8d95d1.jpg", desc: "O 'Esmagador de Novatos'. Veterano com mais de 30 tentativas no Exame Hunter. Especialista em sabotagem psicológica e sucos laxantes. Não possui interesse real em se tornar Hunter." },
+            { name: "Milluki Zoldyck", type: "Assassino / Hacker", nenType: "(confidencial)", status: "Vivo", img: "https://i.pinimg.com/736x/ec/d5/9c/ecd59cfa27936950c0a5df054e298992.jpg", desc: "Segundo filho da Família Zoldyck. Gênio da computação e inventor. Raramente deixa a mansão. Responsável pela tortura e treinamento de Killua no passado." },
+            { name: "Melody", type: "Hunter de Música", nenType: "(confidencial)", status: "Vivo", img: "https://i.pinimg.com/736x/5c/8b/90/5c8b9093f2486c8d54ee4b147e7c9bd8.jpg", desc: "Possui audição sobrenatural. Teve o corpo deformado ao ouvir um trecho da 'Sonata das Trevas'. Busca destruir a partitura original. Guarda-costas leal de Kurapika." },
+            { name: "Zushi", type: "Lutador da Arena", nenType: "(confidencial)", status: "Vivo", img: "https://i.pinimg.com/736x/f8/aa/99/f8aa99572972b2fdd0dd98d207173e25.jpg", desc: "Discípulo de Wing. Praticante dedicado do estilo Shingen-Ryu. Embora aprenda mais devagar que Gon e Killua, possui uma base sólida e determinação inabalável." },
+            { name: "Wing", type: "Mestre Shingen-Ryu", nenType: "(confidencial)", status: "Vivo", img: "https://i.pinimg.com/1200x/b2/82/ef/b282ef5f92550c6b941304b67aa16105.jpg", desc: "Discípulo de Biscuit Krueger. Mentor de Gon e Killua na Torre Celestial. Responsável por ensinar-lhes os fundamentos do Nen. Aparência desleixada, mas mestre competente." },
+            { name: "Shoot McMahon", type: "Hunter de Bestas", nenType: "(confidencial)", status: "Vivo", img: "https://i.pinimg.com/736x/1a/3c/56/1a3c56b5dd0eabc7e1d9c3e773299ee0.jpg", desc: "Discípulo de Morel. Habilidade: Hotel Rafflesia (Gaiola Flutuante). Tímido e reservado, superou seus medos durante a invasão ao palácio. Perdeu uma perna em combate contra Youpi." },
+            { name: "Palm Siberia", type: "Hunter / Soldado", nenType: "(confidencial)", status: "Vivo", img: "https://i.pinimg.com/736x/b7/c8/71/b7c8716709975a8477672d42a0d89c52.jpg", desc: "Discípula de Knov. Transformada em soldado experimental pelas Formigas Quimera. Habilidade: Black Widow (Armadura de Cabelo). Mantém sua lealdade à humanidade." },
+            { name: "Amane", type: "Mordomo Zoldyck", nenType: "(confidencial)", status: "Vivo", img: "https://i.pinimg.com/736x/a3/c0/8d/a3c08d5f444f6f995a7f6ec1cbde5ebc.jpg", desc: "Neta de Tsubone. Designada para acompanhar Killua e Alluka durante a fuga. Extremamente formal e leal às ordens da família." },
+            { name: "Kalluto Zoldyck", type: "Genei Ryodan (#4)", nenType: "(confidencial)", status: "Vivo", img: "https://i.pinimg.com/736x/1c/f5/15/1cf515497c343248cd8545ab762f31c9.jpg", desc: "Membro mais jovem da Família Zoldyck. Juntou-se à Ryodan para substituir Hisoka e 'trazer seu irmão de volta'. Habilidade: Manipulação de papel e vigilância." },
+            { name: "Kikyo Zoldyck", type: "Matriarca Zoldyck", nenType: "(confidencial)", status: "Vivo", img: "https://i.pinimg.com/736x/7a/d3/2f/7ad32fd3c48a61b524761f2639669987.jpg", desc: "Esposa de Silva. Instável e superprotetora, especialmente com Killua. Usa um visor eletrônico devido a ferimentos causados pelo filho. Origem: Cidade do Meteoro." },
+            { name: "Gotoh", type: "Mordomo Chefe", nenType: "(confidencial)", status: "Falecido", img: "https://i.pinimg.com/1200x/a7/4c/97/a74c9763560de7f09e81c9da0c52f8e9.jpg", desc: "Guardião leal de Killua. Usava moedas como balas mortais. Eliminado por Hisoka em uma emboscada na floresta para proteger a fuga de Killua." },
+            { name: "Tsezguerra", type: "Hunter (★)", nenType: "(confidencial)", status: "Vivo", img: "https://i.pinimg.com/736x/d7/3f/af/d73faf6ccb9a5174c1dd3c76d681aac7.jpg", desc: "Hunter de Uma Estrela. Jogador veterano de Greed Island. Liderou a equipe contratada por Battera. Especialista em combate tático e defensivo." },
+            { name: "Basho", type: "Hunter", nenType: "(confidencial)", status: "Vivo", img: "https://i.pinimg.com/736x/d8/7b/a6/d87ba6e966218b5001940a8b5f1308b7.jpg", desc: "Poeta de Haiku. Habilidade: Great Haiku. O que ele escreve em um haiku torna-se realidade (ex: 'meu punho queima'). Guarda-costas do Príncipe Luzurus." },
+            { name: "Kanzai", type: "Zodíaco (Tigre)", nenType: "(confidencial)", status: "Vivo", img: "https://i.pinimg.com/1200x/23/89/1e/23891e126729925383243063a4d619e3.jpg", desc: "Hunter de Tesouros. Impulsivo e agressivo, frequentemente entra em conflito com outros Zodíacos. Parte da equipe de defesa da viagem ao Continente Negro." },
+            { name: "Saiyu", type: "Zodíaco (Macaco)", nenType: "(confidencial)", status: "Vivo", img: "https://i.pinimg.com/736x/cd/e9/28/cde92884a54f5ed93236478c883b101d.jpg", desc: "Hunter de Lista Negra. Artista marcial que usa um bastão que muda de tamanho. Suspeito de ser o traidor infiltrado por Pariston na Associação." },
+            { name: "Botobai Gigante", type: "Zodíaco (Dragão)", nenType: "(confidencial)", status: "Vivo", img: "https://i.pinimg.com/1200x/d7/63/3b/d7633bae834ac5b219e2c3f83857a8e4.jpg", desc: "Hunter de Terroristas (Três Estrelas). Membro mais antigo dos Zodíacos e o mais próximo de Netero em termos de poder e experiência militar." },
+            { name: "Ginta", type: "Zodíaco (Ovelha)", nenType: "(confidencial)", status: "Vivo", img: "https://i.pinimg.com/736x/6c/2b/fc/6c2bfc4a7b15b9456b7aec90bcf39791.jpg", desc: "Hunter de Caça Furtiva. Possui grande força física e velocidade surpreendente para seu tamanho. Emocionou-se profundamente com a morte de Netero." },
+            { name: "Sacco", type: "Zodíaco (Cavalo)", nenType: "(confidencial)", status: "Vivo", img: "https://i.pinimg.com/736x/6c/2b/fc/6c2bfc4a7b15b9456b7aec90bcf39791.jpg", desc: "Hunter de Problemas. Analítico e calmo. Responsável pela gestão de crises diplomáticas da Associação." },
+            { name: "Tsubone", type: "Mordomo Veterana", nenType: "(confidencial)", status: "Vivo", img: "https://i.pinimg.com/736x/eb/73/0a/eb730a8305e954e1dd16b6d95d92c14e.jpg", desc: "A única pessoa que Killua teme além de sua mãe. Habilidade: Rider's High. Transforma-se em veículos que usam a aura do piloto como combustível." },
+            { name: "Geru", type: "Zodíaco (Cobra)", nenType: "(confidencial)", status: "Vivo", img: "https://i.pinimg.com/736x/0f/ff/f1/0ffff129877ca742e1127f179abec947.jpg", desc: "Hunter de Venenos. Farmacêutica e química especialista. Consegue transformar seus braços em serpentes venenosas." },
+            { name: "Piyon", type: "Zodíaco (Coelho)", nenType: "(confidencial)", status: "Vivo", img: "https://i.pinimg.com/736x/bb/b6/31/bbb631b59cd3c7b148f83ebd4030982f.jpg", desc: "Hunter de Paleografia. Especialista em línguas antigas e tecnologia. Responsável pela modernização dos sistemas da Associação." },
+            { name: "Cluck", type: "Zodíaco (Galinha)", nenType: "(confidencial)", status: "Vivo", img: "https://i.pinimg.com/736x/73/ab/88/73ab88f9bbe2db83698dbfed193e99ec.jpg", desc: "Hunter de Plantas. Mestra em botânica. Habilidade de controlar pássaros para transmitir mensagens e vigilância." },
+            { name: "Razor", type: "Mestre de Jogo (GI)", nenType: "(confidencial)", status: "Vivo", img: "https://i.pinimg.com/736x/d4/93/49/d49349304362a65e466121a58027ccb5.jpg", desc: "Responsável pelos sistemas emissivos de Greed Island. Ex-criminoso condenado à morte, recrutado por Ging. Sua força é comparável à de membros da Ryodan." },
+            { name: "Kastro", type: "Lutador da Arena", nenType: "(confidencial)", status: "Falecido", img: "https://i.pinimg.com/736x/e6/02/60/e602609501ffb93444561e422b0bbbfa.jpg", desc: "Lutador talentoso que 'desperdiçou' sua memória criando um clone (Doppelganger), uma habilidade incompatível com seu tipo. Eliminado por Hisoka." },
+            { name: "Elena", type: "Mestre de Jogo (GI)", nenType: "(confidencial)", status: "Vivo", img: "https://i.pinimg.com/736x/4c/f1/be/4cf1be761ee6a81b1a888822319b23b9.jpg", desc: "Irmã gêmea de Eeta. Responsável pela saída do jogo Greed Island. O 'E' de GREED." },
+            { name: "Dwun", type: "Mestre de Jogo (GI)", nenType: "(confidencial)", status: "Vivo", img: "https://i.pinimg.com/736x/79/2e/36/792e368c158df098867eebcb0806cae1.jpg", desc: "O 'D' de GREED. Vive no quarto do castelo em Limeiro. Ging mudou o nome dele de Wdwune para Dwun apenas para a sigla do jogo funcionar." },
+            { name: "List", type: "Mestre de Jogo (GI)", nenType: "(confidencial)", status: "Vivo", img: "https://i.pinimg.com/736x/10/a7/23/10a72398151b72a6576554351551fa77.jpg", desc: "O 'L' de GREED. Responsável pela administração do castelo e explicações aos jogadores que completam o jogo." },
+            { name: "Leroute", type: "Prisioneira", nenType: "(confidencial)", status: "Vivo", img: "https://i.pinimg.com/1200x/06/c0/b5/06c0b5d809cbee92b71434f8cf962735.jpg", desc: "Prisioneira da Torre dos Truques. Especialista em psicologia e jogos mentais. Cumpriu pena de 112 anos por tráfico de animais exóticos e jogos de azar ilegais." },
+            { name: "Mito Freecss", type: "Civil", nenType: "(confidencial)", status: "Vivo", img: "https://i.pinimg.com/1200x/85/01/d2/8501d2328690d82c0c78fa60d66ad485.jpg", desc: "Prima de Ging e mãe adotiva de Gon. Proprietária de um bar na Ilha da Baleia. Detém a custódia legal de Gon após ganhar na justiça contra Ging." },
+            { name: "Canary", type: "Aprendiz de Mordomo", nenType: "(confidencial)", status: "Vivo", img: "https://i.pinimg.com/736x/e5/ec/ae/e5ecae5068928f699fb94fcfa30224bd.jpg", desc: "Guardiã da propriedade Zoldyck. Usa um bastão como arma. Derrotou 100 caçadores de recompensa sozinha. Leal a Killua." },
+            { name: "Asuta", type: "Hunter", nenType: "(confidencial)", status: "Vivo", img: "https://i.pinimg.com/736x/2f/84/cd/2f84cdb662ea5b98da48c1aaf1aecf75.jpg", desc: "Registro Hunter incompleto. Dados em processamento pelo sistema." },
+            { name: "Jispa", type: "Hunter", nenType: "(confidencial)", status: "Vivo", img: "https://i.pinimg.com/1200x/17/bf/89/17bf89c48bb6be3fc3747f314bbb7c41.jpg", desc: "Registro Hunter incompleto. Dados em processamento pelo sistema." },
+            { name: "Maha Zoldyck", type: "Assassino Lendário", nenType: "(confidencial)", status: "Vivo", img: "https://i.pinimg.com/736x/10/48/e7/1048e717fc31267ad30cecfdf51bdb64.jpg", desc: "Membro mais antigo da Família Zoldyck. Avô de Zeno. O único que lutou com Netero no auge e sobreviveu. Sua força atual é desconhecida." },
+            { name: "Zigg Zoldyck", type: "Explorador", nenType: "(confidencial)", status: "Desconhecido", img: "https://i.pinimg.com/736x/89/de/db/89dedbdbd687cba4c657fa203fa762fa.jpg", desc: "Lenda da Família Zoldyck. Participou da expedição não oficial ao Continente Negro com Netero. Status atual e paradeiro são mistérios absolutos." }
+        ];
+
+        // --- NEWS DATA ---
+        const newsDB = [
+            { title: "Black Whale Departure", date: "2026-02-01", content: "The massive ship has left the port towards the Dark Continent. Kakin princes are on board.", img: "https://image.pollinations.ai/prompt/anime%20ship%20ocean%20hunter%20x%20hunter?width=600&height=400&nologo=true" },
+            { title: "Heavens Arena Incident", date: "2026-01-28", content: "Floor master match resulted in 50 casualties in the audience. Hisoka vs Chrollo confirmed.", img: "https://image.pollinations.ai/prompt/anime%20arena%20tower%20hunter%20x%20hunter?width=600&height=400&nologo=true" },
+            { title: "Meteor City Supply Drop", date: "2026-01-15", content: "Phantom Troupe activity reported near the drop zone. Stay clear.", img: "https://image.pollinations.ai/prompt/anime%20junkyard%20city%20hunter%20x%20hunter?width=600&height=400&nologo=true" }
+        ];
+
+        const locationDB = [
+            { name: "Ilha da Baleia", risk: "Nível 1 (Seguro)", img: "https://i.pinimg.com/1200x/14/c7/3b/14c73b61cb1d28bbab2cf81c8f9c4a6b.jpg", desc: "Local de nascimento de Gon Freecss. Uma pequena ilha de pescadores isolada. Apesar de pacífica, a floresta central abriga o 'Mestre do Pântano', uma besta local de grande porte. Ponto de reabastecimento comum para navios mercantes." },
+            { name: "Torre Celestial", risk: "Nível 3 (Combate)", img: "https://i.pinimg.com/736x/aa/c1/cb/aac1cb8e1999d00a316e8dc1e17ff94d.jpg", desc: "A arena de combate mais famosa do mundo (991m de altura). Os andares 200+ são uma zona de concentração de usuários de Nen. Mortes na arena são comuns e isentas de investigação criminal. Lar dos Mestres de Andar." },
+            { name: "Associação Hunter", risk: "Nível 0 (QG)", img: "https://i.pinimg.com/1200x/b2/6d/15/b26d15495b0542978a96d176fe6773ef.jpg", desc: "O centro nervoso do mundo Hunter. Acesso restrito a licenciados e funcionários. Possui arquivos confidenciais, salas de treinamento e o escritório do Presidente. Protegido por Hunters de elite 24/7." },
+            { name: "Yorknew City", risk: "Nível 3 (Crime)", img: "https://i.pinimg.com/1200x/96/a3/c5/96a3c562c7a4970860c5c302187d29ad.jpg", desc: "Metrópole global. Durante setembro, hospeda o maior leilão do mundo, atraindo a Máfia e criminosos de Classe A. O submundo da cidade é ativo e perigoso. Palco histórico do massacre da Genei Ryodan." },
+            { name: "NGL (Neo Green Life)", risk: "Nível 5 (Zona Proibida)", img: "https://i.pinimg.com/1200x/86/bf/3e/86bf3e0be63c2d8c0b4c73b3d18446dc.jpg", desc: "Nação autônoma ecologista radical. Tecnologia moderna é punida com morte ou prisão. Após o incidente das Formigas Quimera, a região está sob quarentena e supervisão da Associação Hunter e da V5." },
+            { name: "Montanha Kukuroo", risk: "Nível 4 (Privado)", img: "https://i.pinimg.com/1200x/cb/e0/cc/cbe0cc0b68ee3e2902e708a6502f16a6.jpg", desc: "Propriedade da Família Zoldyck. Cercada por muros de pedra e o 'Portão da Provação'. A floresta circundante contém Mike (cão de guarda gigante). Invasores são eliminados sem aviso prévio." },
+            { name: "Cidade Meteoro", risk: "Nível 5 (Sem Lei)", img: "https://i.pinimg.com/1200x/3b/ca/4b/3bca4bde46ade536103a5abf940324a2.jpg", desc: "Um ferro-velho habitado por milhões de párias. Não existe nos mapas oficiais. Seus habitantes seguem a lei da retaliação absoluta. Berço da Genei Ryodan. Hunters são aconselhados a evitar a área." },
+            { name: "Greed Island", risk: "Nível 4 (Jogo Mortal)", img: "https://i.pinimg.com/1200x/d8/da/dc/d8dadc9b25d15700f58d7c8308401b89.jpg", desc: "Localizado a leste de Yorbian. Só acessível via console JoyStation. O jogo é real e a morte no jogo resulta em morte na vida real. Habitado por bestas mágicas criadas por Nen e Game Masters poderosos." }
+        ];
+
+        const creatureDB = [
+            {
+                species: "Formigas Quimera",
+                risk: "Rank B (Ameaça Global)",
+                img: "https://i.pinimg.com/1200x/f3/e3/b8/f3e3b88697ccdcb460103397619d1e86.jpg",
+                desc: "Insetos extremamente perigosos provenientes do Continente Negro. Possuem a característica de 'Fagogênese', adquirindo traços genéticos das presas que devoram. A colônia evoluiu rapidamente ao consumir humanos com Nen.",
+                individuals: [
+                    { name: "Rainha das Quimeras", role: "Rainha", status: "Falecido", img: "https://i.pinimg.com/736x/d6/ca/87/d6ca87ef896800f43f9b31394a9b6932.jpg", desc: "A progenitora da colônia. Focada exclusivamente na reprodução e no nascimento do Rei." },
+                    { name: "Meruem", role: "Rei", status: "Falecido", img: "https://i.pinimg.com/1200x/f3/e3/b8/f3e3b88697ccdcb460103397619d1e86.jpg", desc: "O Rei das Formigas Quimera. O ser individual mais poderoso já registrado pela Associação Hunter." },
+                    { name: "Neferpitou", role: "Guarda Real", status: "Falecido", img: "https://i.pinimg.com/736x/5d/89/ab/5d89ab161f3cde177c3de26350c418d3.jpg", desc: "Guarda Real. Especialista em manipulação e cura (Doctor Blythe). Possui uma aura aterrorizante." },
+                    { name: "Shaiapouf", role: "Guarda Real", status: "Falecido", img: "https://i.pinimg.com/1200x/fe/e1/c7/fee1c78f7dabdd3a4c5a4928a15dbbe5.jpg", desc: "Guarda Real. Estrategista e manipulador emocional. Pode dividir seu corpo em minúsculas cópias." },
+                    { name: "Menthuthuyoupi", role: "Guarda Real", status: "Falecido", img: "https://i.pinimg.com/1200x/6d/79/69/6d7969806caa010c38c4491e9379ed51.jpg", desc: "Guarda Real. Uma besta de pura força física e metamorfose. O único guarda sem genes humanos (apenas bestas mágicas)." },
+                    { name: "Colt", role: "Líder de Divisão", status: "Vivo", img: "https://i.pinimg.com/736x/e9/df/35/e9df35e7326c442ccebdc51151c39b29.jpg", desc: "Primeira formiga a desenvolver fala humana. Leal à Rainha e protetor da criança (Kite)." },
+                    { name: "Meleoron", role: "Líder de Divisão", status: "Vivo", img: "https://i.pinimg.com/736x/e3/fc/a2/e3fca2f90192a0abb204e3933b732ee3.jpg", desc: "Habilidade: 'Perfect Plan' (Invisibilidade total). Aliou-se aos Hunters para vingar Peggy." },
+                    { name: "Rammot", role: "Oficial", status: "Falecido", img: "https://i.pinimg.com/736x/3f/97/d8/3f97d8d7ae23de7939c2881be2bd8553.jpg", desc: "O primeiro a despertar Nen após ser atacado por Gon e Killua." },
+                    { name: "Cheetu", role: "Líder de Divisão", status: "Falecido", img: "https://i.pinimg.com/736x/27/8f/30/278f309782d1227ea49ff6f2f46f45d0.jpg", desc: "Velocista extremo. Eliminado por Silva Zoldyck." },
+                    { name: "Welfin", role: "Líder de Divisão", status: "Vivo", img: "https://i.pinimg.com/736x/04/84/81/04848154055ff761be96227ed0875251.jpg", desc: "Paranoico e estrategista. Negociou com o Rei. Atualmente em busca de Gyro." },
+                    { name: "Alligator", role: "Oficial", status: "Falecido", img: "https://i.pinimg.com/736x/e2/9e/9e/e29e9e6c85bf58ba721e3b5e26c929bb.jpg", desc: "Formiga com traços de crocodilo. Voraz e agressivo." },
+                    { name: "Centipede", role: "Oficial", status: "Falecido", img: "https://i.pinimg.com/736x/0b/c8/46/0bc846fb06ccec4f4478ea2ca1e3049c.jpg", desc: "Formiga centopeia. Capturado e interrogado por Gon." },
+                    { name: "Leol", role: "Líder de Divisão", status: "Falecido", img: "https://i.pinimg.com/1200x/9a/7a/a4/9a7aa4e09f407ddc5ebab20bf615fd11.jpg", desc: "Habilidade de aluguel de Nen. Eliminado por Morel." },
+                    { name: "Reina", role: "Civil", status: "Vivo", img: "https://i.pinimg.com/736x/42/8e/13/428e13501ae249a74f7423fc34644ead.jpg", desc: "Humana de NGL renascida. Retornou à sua vila natal com Bloster." },
+                    { name: "Kite (Quimera)", role: "Renascido", status: "Vivo", img: "https://i.pinimg.com/736x/c7/d8/98/c7d898e6b50c77ba659318d8c1767691.jpg", desc: "Reencarnação de Kite como irmão gêmeo de Meruem." },
+                    { name: "Zazan", role: "Líder de Divisão", status: "Falecido", img: "https://i.pinimg.com/1200x/74/53/30/7453300fb3a5e804fa4fab06638697ad.jpg", desc: "Autoproclamada Rainha após a morte da original. Eliminada por Feitan." },
+                    { name: "Palm (Quimera)", role: "Soldado Experimental", status: "Vivo", img: "https://i.pinimg.com/736x/2e/b0/d0/2eb0d02c726e6ad94e2526ae8672c9d7.jpg", desc: "Hunter transformada. Manteve suas memórias e ajudou na missão." },
+                    { name: "Flutter", role: "Oficial", status: "Falecido", img: "https://i.pinimg.com/1200x/df/df/3b/dfdf3b95ea28ff9479d1edb25856cb4d.jpg", desc: "Libélula. Usado por Knov e depois manipulado por Ikalgo." },
+                    { name: "Peggy", role: "Oficial", status: "Falecido", img: "https://i.pinimg.com/1200x/95/22/3e/95223ed9cee54fc64bc97abdb46bd219.jpg", desc: "Erudito da colônia. Morto pelo Rei logo após o nascimento." },
+                    { name: "Bloster", role: "Líder de Divisão", status: "Vivo", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ_OPmoyVQONke0vLoBiTCvQ10uIPYaCRXukw&s", desc: "Formiga lagosta. Atualmente vivendo pacificamente em NGL." },
+                    { name: "Pikin", role: "Oficial", status: "Falecido", img: "https://i.pinimg.com/1200x/6f/83/21/6f832115e6a739a980e08e86e84540a1.jpg", desc: "Oficial da divisão de Zazan. Capturado pela Ryodan." },
+                    { name: "Ikalgo", role: "Oficial", status: "Vivo", img: "https://i.pinimg.com/1200x/53/a3/8e/53a38e587a558e49bd01faf7aa3597d3.jpg", desc: "Polvo. Tornou-se o melhor amigo de Killua durante a invasão." },
+                    { name: "Hina", role: "Oficial", status: "Vivo", img: "https://i.pinimg.com/1200x/01/34/0a/01340af053fa3f23fdba64aa361ee08b.jpg", desc: "Exorcista de Nen. Acompanha Shidore e Welfin." },
+                    { name: "Koala", role: "Oficial", status: "Vivo", img: "https://i.pinimg.com/1200x/84/01/fc/8401fc0eb7dae620fcb99107db980f43.jpg", desc: "Assassino arrependido. Fez um pacto de servidão com Kite." },
+                    { name: "Hollow", role: "Oficial", status: "Vivo", img: "https://i.pinimg.com/736x/81/a1/ea/81a1ead95d4df2799b91ca23ba94288b.jpg", desc: "Coruja. Auxiliar de Gorila na caça a Gon." },
+                    { name: "Baro", role: "Oficial", status: "Falecido", img: "https://i.pinimg.com/736x/0b/81/67/0b8167153f55dc4cb67b5ff78049866f.jpg", desc: "Tatu. Eliminado por Gon." },
+                    { name: "Bat", role: "Oficial", status: "Falecido", img: "https://i.pinimg.com/1200x/19/06/03/190603d5d3e3aaab5359d7d6b7b9927a.jpg", desc: "Morcego. Eliminada por Gon." },
+                    { name: "Irmãos Ortho", role: "Oficiais", status: "Falecido", img: "https://i.pinimg.com/736x/e9/09/e2/e909e2d3df96eb86be36e16ccd3b6938.jpg", desc: "Dupla de irmãos que usam jogo de dardos de Nen. Eliminados por Killua." }
+                ]
+            },
+            {
+                species: "Kiriko (Navegadores)",
+                risk: "Rank C (Variável)",
+                img: "https://i.pinimg.com/736x/4a/02/7c/4a027c442475f8502283038661273972.jpg",
+                desc: "Bestas Mágicas inteligentes capazes de assumir forma humana e falar. Frequentemente contratados pela Associação Hunter como 'Navegadores' para guiar candidatos aos locais de exame. Possuem força e agilidade superiores às humanas.",
+                individuals: [
+                    { name: "Navegador (Casal)", role: "Examinador", status: "Vivo", img: "https://i.pinimg.com/736x/4a/02/7c/4a027c442475f8502283038661273972.jpg", desc: "O casal que testou Gon, Kurapika e Leorio antes do Exame 287. Vivem em uma cabana isolada e testam o caráter dos candidatos." },
+                    { name: "Filho Kiriko", role: "Navegador", status: "Vivo", img: "https://i.pinimg.com/736x/4a/02/7c/4a027c442475f8502283038661273972.jpg", desc: "Filho do casal de navegadores. Ajudou a transportar os candidatos voando." }
+                ]
+            }
+        ];
+
+        const users = {
+            "gon": { name: "Gon Freecss", pass: "123", img: "https://i.pinimg.com/1200x/45/87/1a/45871a387861ca0b7517fc836da84a31.jpg", rank: "(confidencial)" },
+            "killua": { name: "Killua Zoldyck", pass: "zoldyck", img: "https://i.pinimg.com/1200x/e6/b9/84/e6b98407a993d4515300afef72057aec.jpg", rank: "(confidencial)" },
+            "zero": { 
+                name: "Kurokawa Akin Min", 
+                pass: "akin", 
+                img: "https://media.discordapp.net/attachments/1456713520413675804/1460078727642878015/file_0000000073ec71f5ab9f2ed8934c9d64.png?ex=6987e2c7&is=69869147&hm=21249bc9e1ddb118c1c9c347aa63a89ba111ff826c93265a4ba4f31fc26cef58&=&format=webp&quality=lossless&width=656&height=656", 
+                rank: "Rank D",
+                info: { "Data de Nascimento": "11/06/1974", "Idade": "25 anos", "Tipo Sanguíneo": "O-", "Local de Nascimento": "Shimokitazawa (Tokyo)" },
+                messages: []
+            },
+            "kageshiro": { 
+                name: "Kageshiro Kuruta", 
+                pass: "kuruta", 
+                img: "https://media.discordapp.net/attachments/1456713520413675804/1460080250749845504/1767759806552.jpg?ex=6987e432&is=698692b2&hm=6a7664fe9902cca4f4c3533fa89f7d06c97b64d565b7c45f35d88f2a45aed17c&=&format=webp&width=375&height=656", 
+                rank: "Rank D",
+                info: { "Data de Nascimento": "26/09/83", "Idade": "16 anos", "Tipo Sanguíneo": "O+", "Local de Nascimento": "Tribo Kuruta" },
+                messages: []
+            },
+            "agnes": { 
+                name: "Agnes Morrígan Zoldyck", 
+                pass: "morrigan", 
+                img: "https://media.discordapp.net/attachments/1456713520413675804/1460079404226052106/1767762588568.jpg?ex=6987e368&is=698691e8&hm=0105656312d8058f570226d02445690efd92e5ff65c175c243690cd8bbc3c692&=&format=webp&width=510&height=656", 
+                rank: "Rank D",
+                info: { "Data de Nascimento": "03/01/1969", "Idade": "30 anos", "Tipo Sanguíneo": "O-", "Local de Nascimento": "Ankoku Tairiku" },
+                messages: []
+            },
+            "melissa": { 
+                name: "Melissa Ackerman", 
+                pass: "ackerman", 
+                img: "https://media.discordapp.net/attachments/1456713520413675804/1460078117778362612/WhatsApp_Image_2026-01-11_at_19.14.38.jpeg?ex=6987e236&is=698690b6&hm=6ea9b18882fece5aae729c5eca111734bdb84003f729ea797bbbd9b87fe01392&=&format=webp&width=656&height=656", 
+                rank: "Rank D",
+                info: { "Data de Nascimento": "09/05/83", "Idade": "16 anos", "Tipo Sanguíneo": "A+", "Local de Nascimento": "Cidade do Meteoro" },
+                messages: []
+            },
+            "morana": { 
+                name: "Morana Ravenscar", 
+                pass: "ravenscar", 
+                img: "https://media.discordapp.net/attachments/1456713520413675804/1460083643182616639/ChatGPT_Image_7_de_jan._de_2026_11_53_05.png?ex=6988901b&is=69873e9b&hm=79425292638e6c88404a6895858323ecd642f0ded109754a67dded8bf50c0aa1&=&format=webp&quality=lossless&width=437&height=656", 
+                rank: "Rank D",
+                info: { "Data de Nascimento": "09/02/1981", "Idade": "18 anos", "Tipo Sanguíneo": "AB-", "Local de Nascimento": "North Yorkshire, Inglaterra" },
+                messages: []
+            }
+        };
+
+        let currentUser = null;
+
+        // --- LOGIC ---
+        function attemptLogin() {
+            const u = document.getElementById('login-user').value.toLowerCase().trim();
+            const p = document.getElementById('login-pass').value.trim();
+            const msg = document.getElementById('login-msg');
+
+            if (users[u] && users[u].pass === p) {
+                currentUser = users[u];
+                msg.style.color = "var(--hunter-primary)";
+                msg.innerText = "ACCESS GRANTED";
+                setTimeout(() => {
+                    document.getElementById('login-screen').classList.add('hidden');
+                    document.getElementById('main-interface').classList.remove('hidden');
+                    initApp();
+                }, 1000);
+            } else {
+                msg.style.color = "var(--hunter-secondary)";
+                msg.innerText = "ACCESS DENIED";
+            }
+        }
+
+        function initApp() {
+            document.getElementById('display-username').innerText = currentUser.name.toUpperCase();
+            searchHunters('');
+            renderNews();
+            renderCreatures();
+            renderLocations();
+            if(currentUser.info) renderProfile();
+        }
+
+        function showSection(id) {
+            document.querySelectorAll('.content-section').forEach(el => el.classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
+            
+            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+            if (window.event && window.event.target && window.event.target.classList.contains('nav-btn')) {
+                window.event.target.classList.add('active');
+            }
+
+            if (id === 'hunter-search') {
+                searchHunters('');
+            }
+            if (id === 'creatures') {
+                renderCreatures(); // Reset to species view
+            }
+        }
+
+        function renderProfile() {
+            const container = document.getElementById('profile-data');
+            if (!container) return;
+            container.innerHTML = "";
+            
+            document.getElementById('profile-display-img').src = currentUser.img;
+            document.getElementById('profile-display-name').innerText = currentUser.name;
+            document.getElementById('profile-display-rank').innerText = currentUser.rank;
+
+            for (const [key, val] of Object.entries(currentUser.info)) {
+                const p = document.createElement('p');
+                p.innerHTML = `<strong style="color:var(--hunter-primary)">${key}:</strong> <span style="color: #ccc; float: right;">${val}</span>`;
+                p.style.borderBottom = "1px solid #333";
+                p.style.paddingBottom = "5px";
+                container.appendChild(p);
+            }
+
+            // Render Messages
+            const msgList = document.getElementById('msg-list');
+            msgList.innerHTML = "";
+            if (currentUser.messages && currentUser.messages.length > 0) {
+                currentUser.messages.forEach(msg => {
+                    const div = document.createElement('div');
+                    div.className = `msg-item ${msg.read ? '' : 'unread'}`;
+                    div.onclick = () => openMessage(msg);
+                    div.innerHTML = `
+                        <div style="display:flex; justify-content:space-between; color: #fff; font-weight: bold;"><span>${msg.subject}</span> <small>${msg.date}</small></div>
+                        <div style="color: #888; font-size: 0.9rem;">De: ${msg.from}</div>
+                    `;
+                    msgList.appendChild(div);
+                });
+            } else {
+                msgList.innerHTML = "<p style='color:#666; font-style:italic;'>Nenhuma mensagem recebida.</p>";
+            }
+        }
+
+        function searchHunters(val) {
+            const container = document.getElementById('hunter-results');
+            container.innerHTML = "";
+            
+            if (!val) return;
+            
+            let filtered = charDB.filter(c => c.name.toLowerCase().includes(val.toLowerCase()));
+            
+            filtered.forEach(char => {
+                const rank = char.rank || "(confidencial)";
+                const card = document.createElement('div');
+                card.className = 'news-card';
+                card.style.borderTopColor = char.status === 'Vivo' ? 'var(--hunter-primary)' : 'var(--hunter-secondary)';
+                card.onclick = () => openCharacter(char.name);
+                card.innerHTML = `
+                    <img src="${char.img}" class="news-thumb" onerror="this.src='https://placehold.co/200'">
+                    <h4 style="color: #fff; margin: 10px 0;">${char.name}</h4>
+                    <p style="font-size: 0.9rem; color: #ccc; margin-bottom: 5px;"><strong>Rank:</strong> ${rank}</p>
+                    <p style="font-size: 0.9rem; color: #ccc; margin-bottom: 5px;"><strong>Tipo:</strong> ${char.type}</p>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function renderNews() {
+            const container = document.getElementById('news-container');
+            newsDB.forEach(n => {
+                const div = document.createElement('div');
+                div.className = 'news-card';
+                div.innerHTML = `
+                    <img src="${n.img}" class="news-thumb">
+                    <h4>${n.title}</h4>
+                    <p style="font-size: 0.9rem; color: #ccc;">${n.content}</p>
+                    <small style="color: var(--hunter-primary);">${n.date}</small>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // --- CREATURES LOGIC ---
+        function renderCreatures() {
+            const container = document.getElementById('creature-results');
+            container.innerHTML = "";
+            
+            creatureDB.forEach((specie, index) => {
+                const card = document.createElement('div');
+                card.className = 'news-card';
+                card.style.borderTopColor = 'var(--hunter-secondary)';
+                card.style.display = 'none'; // Oculto por padrão
+                card.onclick = () => openSpecies(index);
+                card.innerHTML = `
+                    <img src="${specie.img}" class="news-thumb">
+                    <h4 style="color: #fff; margin: 10px 0;">${specie.species}</h4>
+                    <p style="font-size: 0.9rem; color: #ccc; margin-bottom: 5px;"><strong>Risco:</strong> ${specie.risk}</p>
+                    <p style="font-size: 0.8rem; color: #888;">${specie.individuals.length} indivíduos registrados</p>
+                `;
+                container.appendChild(card);
+            });
+
+            // Se houver texto na busca, aplica o filtro imediatamente
+            const searchInput = document.querySelector('#creatures .search-bar');
+            if (searchInput && searchInput.value.trim() !== "") {
+                searchCreatures(searchInput.value);
+            }
+        }
+
+        function searchCreatures(val) {
+            // Simple search for Species names
+            const container = document.getElementById('creature-results');
+            const cards = container.getElementsByClassName('news-card');
+            val = val.toLowerCase().trim();
+
+            // Verifica se está na visualização de detalhes (Indivíduos) para não esconder tudo ao limpar
+            const isDetails = container.innerHTML.includes('VOLTAR PARA ESPÉCIES');
+
+            if (val === "" && !isDetails) {
+                Array.from(cards).forEach(card => card.style.display = "none");
+                return;
+            }
+
+            Array.from(cards).forEach(card => {
+                const title = card.getElementsByTagName('h4')[0].innerText.toLowerCase();
+                if (title.includes(val)) {
+                    card.style.display = "";
+                } else {
+                    card.style.display = "none";
+                }
+            });
+        }
+
+        function openSpecies(index) {
+            const container = document.getElementById('creature-results');
+            const specie = creatureDB[index];
+            container.innerHTML = `
+                <div style="grid-column: 1 / -1; margin-bottom: 20px;">
+                    <button onclick="renderCreatures()" style="padding: 8px 16px; font-size: 0.8rem;">&larr; VOLTAR PARA ESPÉCIES</button>
+                    <h2 style="color: var(--hunter-secondary); margin-top: 15px;">${specie.species} - Indivíduos</h2>
+                    <p style="color: #ccc; font-family: var(--font-mono);">${specie.desc}</p>
+                </div>
+            `;
+
+            specie.individuals.forEach(ind => {
+                const card = document.createElement('div');
+                card.className = 'news-card';
+                card.style.borderTopColor = ind.status === 'Vivo' ? 'var(--hunter-primary)' : 'var(--hunter-secondary)';
+                
+                // Reusing the character modal logic for individuals
+                card.onclick = () => {
+                    document.getElementById('char-modal-img').src = ind.img;
+                    document.getElementById('char-modal-name').innerText = ind.name;
+                    document.getElementById('char-modal-type').innerText = ind.role;
+                    const statusSpan = document.getElementById('char-modal-status');
+                    statusSpan.innerText = ind.status;
+                    statusSpan.style.color = ind.status === 'Vivo' ? 'var(--hunter-green)' : 'var(--hunter-secondary)';
+                    document.getElementById('char-modal-desc').innerText = ind.desc;
+                    document.getElementById('character-modal').classList.remove('hidden');
+                };
+
+                card.innerHTML = `
+                    <img src="${ind.img}" class="news-thumb" onerror="this.src='https://placehold.co/200'">
+                    <h4 style="color: #fff; margin: 10px 0;">${ind.name}</h4>
+                    <p style="font-size: 0.9rem; color: #ccc; margin-bottom: 5px;"><strong>Função:</strong> ${ind.role}</p>
+                    <p style="font-size: 0.9rem; color: #ccc;"><strong>Status:</strong> ${ind.status}</p>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function renderLocations() {
+            const container = document.getElementById('location-results');
+            container.innerHTML = "";
+            locationDB.forEach(loc => {
+                const card = document.createElement('div');
+                card.className = 'news-card';
+                card.style.borderTopColor = 'var(--hunter-accent)';
+                card.onclick = () => openLocation(loc.name);
+                card.innerHTML = `
+                    <img src="${loc.img}" class="news-thumb">
+                    <h4 style="color: #fff;">${loc.name}</h4>
+                    <p style="font-size: 0.8rem; color: var(--hunter-secondary); margin-top:5px;">${loc.risk}</p>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function openCharacter(name) {
+            const char = charDB.find(c => c.name === name);
+            if (!char) return;
+
+            document.getElementById('char-modal-img').src = char.img;
+            document.getElementById('char-modal-name').innerText = char.name;
+            document.getElementById('char-modal-nen').innerText = char.nenType || "Desconhecido";
+            document.getElementById('char-modal-type').innerText = char.type;
+            
+            const statusSpan = document.getElementById('char-modal-status');
+            statusSpan.innerText = char.status;
+            statusSpan.style.color = char.status === 'Vivo' ? 'var(--hunter-green)' : 'var(--hunter-secondary)';
+
+            document.getElementById('char-modal-desc').innerText = char.desc;
+            document.getElementById('character-modal').classList.remove('hidden');
+        }
+
+        function closeCharacterModal() {
+            document.getElementById('character-modal').classList.add('hidden');
+        }
+
+        function openLocation(name) {
+            const loc = locationDB.find(l => l.name === name);
+            if (!loc) return;
+            document.getElementById('loc-modal-img').src = loc.img;
+            document.getElementById('loc-modal-name').innerText = loc.name;
+            document.getElementById('loc-modal-risk').innerText = loc.risk;
+            document.getElementById('loc-modal-desc').innerText = loc.desc;
+            document.getElementById('location-modal').classList.remove('hidden');
+        }
+
+        function closeLocationModal() {
+            document.getElementById('location-modal').classList.add('hidden');
+        }
+
+        function openMessage(msg) {
+            document.getElementById('msg-modal-subject').innerText = msg.subject;
+            document.getElementById('msg-modal-from').innerText = msg.from;
+            document.getElementById('msg-modal-date').innerText = msg.date;
+            document.getElementById('msg-modal-content').innerText = msg.content;
+            document.getElementById('message-modal').classList.remove('hidden');
+        }
+
+        function closeMessageModal() {
+            document.getElementById('message-modal').classList.add('hidden');
+        }
+
+        function logout() {
+            location.reload();
+        }
+    </script>
+</body>
+</html>
