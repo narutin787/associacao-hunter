@@ -89,6 +89,30 @@ button:active { transform: translateY(0); }
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 }
 
+.password-container {
+    position: relative;
+    /* Este container agrupa o input e o botão de visualização */
+}
+
+.password-container .login-input {
+    padding-right: 45px; /* Adiciona espaço para o ícone não sobrepor o texto */
+}
+
+.toggle-password-btn {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #888; /* Cinza mais claro para melhor visibilidade */
+    user-select: none; /* Evita que o ícone seja selecionado como texto */
+    transition: color 0.2s ease;
+}
+
+.toggle-password-btn:hover {
+    color: var(--hunter-primary);
+}
+
 .login-input {
     background: #f8f9fa;
     border: 2px solid #e9ecef;
@@ -116,6 +140,24 @@ header {
     box-shadow: 0 5px 20px rgba(0,0,0,0.5);
     position: sticky; top: 0; z-index: 100;
     backdrop-filter: blur(10px);
+}
+
+.header-brand {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.header-logo {
+    height: 50px;
+}
+
+.header-title {
+    font-weight: bold;
+    font-size: 1.5rem;
+    color: var(--hunter-primary);
+    font-family: var(--font-mono);
+    text-shadow: 0 0 10px rgba(0, 210, 255, 0.5);
 }
 
 nav {
