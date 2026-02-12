@@ -478,9 +478,7 @@
                 img: "https://i.pinimg.com/736x/de/b8/a8/deb8a8e4125920858843f7f0b08a8541.jpg", 
                 rank: "Rank D",
                 info: { "Data de Nascimento": "11/06/1974", "Idade": "25 anos", "Tipo Sanguíneo": "O-", "Local de Nascimento": "Shimokitazawa (Tokyo)" },
-                messages: [
-                    { subject: "Reencontro", date: "1999-09-10", from: "Velho Amigo", content: "oi. quanto tempo. agora voce e um cacador tbm?", read: false }
-                ],
+                messages: [],
                 balance: 0,
                 transactions: []
             },
@@ -587,9 +585,6 @@
             renderLocations();
             if(currentUser.info) renderProfile();
             handleUrlParams();
-
-            // Inicia a simulação de eventos recebidos (apenas para demonstração)
-            startEventSimulation();
         }
 
         function showSection(id) {
@@ -964,26 +959,6 @@
             } else {
                 console.log("Não foi possível enviar a notificação. Permissão não concedida ou Service Worker não está pronto.");
             }
-        }
-
-        function startEventSimulation() {
-            // Simula o recebimento de uma mensagem urgente após 10 segundos de login
-            setTimeout(() => {
-                const newMessage = { subject: "ALERTA DE MISSÃO", date: "AGORA", from: "Associação Hunter", content: "Hunter, sua presença é solicitada no saguão principal. Uma nova espécie foi avistada próxima à fronteira de NGL.", read: false };
-                
-                if (currentUser && currentUser.messages) {
-                    currentUser.messages.unshift(newMessage);
-                    renderProfile(); // Atualiza a lista na tela
-                    sendNotification("Nova Mensagem Recebida", "Associação Hunter: ALERTA DE MISSÃO - Prioridade Alta");
-                    
-                    // Adiciona indicador visual no menu se estivermos em outra aba
-                    const profileBtn = document.querySelector("button[onclick=\"showSection('profile')\"]");
-                    if(profileBtn && !profileBtn.classList.contains('active')) {
-                        profileBtn.style.color = "var(--hunter-secondary)";
-                        profileBtn.innerText = "MEU PERFIL (!)";
-                    }
-                }
-            }, 10000); // 10 segundos
         }
     </script>
 </body>
