@@ -160,6 +160,16 @@ header {
     text-shadow: 0 0 10px rgba(0, 210, 255, 0.5);
 }
 
+#hamburger-btn {
+    display: none; /* Oculto em desktop */
+    background: none;
+    border: none;
+    color: var(--hunter-primary);
+    font-size: 2rem;
+    cursor: pointer;
+    padding: 0 10px;
+}
+
 nav {
     display: flex;
     gap: 5px;
@@ -268,23 +278,120 @@ nav button.active { border-bottom: 2px solid var(--hunter-primary); color: var(-
 .close-btn { position: absolute; top: 10px; right: 20px; font-size: 2rem; cursor: pointer; color: var(--hunter-secondary); }
 .modal-img { width: 100%; height: 300px; object-fit: cover; margin-bottom: 20px; border-radius: 4px; }
 
+/* --- Layout Profissional de Notícias (News Modal) --- */
+.news-modal-layout {
+    padding: 0 !important; /* Remove padding padrão do modal para controle total */
+    background: #0e1014 !important;
+    border: 1px solid var(--hunter-border) !important;
+    overflow: hidden !important;
+    display: flex;
+    flex-direction: column;
+    max-width: 900px !important;
+}
+
+.news-header-img {
+    width: 100%;
+    height: 350px;
+    object-fit: cover;
+    mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+    border-bottom: 1px solid var(--hunter-primary);
+}
+
+.news-content-scroll {
+    padding: 0 50px 50px 50px;
+    overflow-y: auto;
+    margin-top: -80px; /* Sobrepõe levemente a imagem */
+    position: relative;
+    z-index: 10;
+}
+
+.news-title-pro {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: -1px;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 0 #000;
+    line-height: 1.1;
+}
+
+.news-meta-pro {
+    font-family: var(--font-mono);
+    color: var(--hunter-primary);
+    font-size: 0.9rem;
+    border-bottom: 1px solid #333;
+    padding-bottom: 20px;
+    margin-bottom: 30px;
+    display: flex;
+    gap: 15px;
+}
+
+.news-body-pro {
+    font-family: 'Georgia', serif; /* Fonte serifada para leitura longa */
+    font-size: 1.15rem;
+    line-height: 1.8;
+    color: #d0d0d0;
+    text-align: justify;
+}
+
+.news-body-pro h3 {
+    color: var(--hunter-primary);
+    font-family: var(--font-sans);
+    font-size: 1.4rem;
+    margin-top: 40px;
+    margin-bottom: 15px;
+    border-left: 4px solid var(--hunter-secondary);
+    padding-left: 15px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.news-body-pro p { margin-bottom: 20px; }
+
+/* Overrides para tabelas dentro da notícia */
+.news-body-pro table { width: 100% !important; border-collapse: collapse !important; margin: 30px 0 !important; background: rgba(255,255,255,0.02) !important; }
+.news-body-pro th { background: rgba(0, 210, 255, 0.1) !important; color: var(--hunter-primary) !important; padding: 15px !important; text-transform: uppercase; font-family: var(--font-mono); border: 1px solid #444 !important; }
+.news-body-pro td { padding: 15px !important; border: 1px solid #444 !important; color: #ccc !important; }
+
 /* Responsividade Mobile */
 @media (max-width: 768px) {
     header {
-        flex-direction: column;
-        text-align: center;
-        gap: 15px;
+        flex-direction: row;
+        justify-content: space-between;
+        padding: 15px;
+    }
+
+    #hamburger-btn {
+        display: block;
+        z-index: 1001;
     }
 
     nav {
-        justify-content: center;
+        position: fixed;
+        top: 0;
+        left: -100%;
         width: 100%;
+        height: 100vh;
+        background: var(--hunter-bg);
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        transition: left 0.3s ease-in-out;
+        z-index: 1000;
+    }
+
+    nav.mobile-nav-active {
+        left: 0;
     }
 
     nav button {
-        flex: 1 1 auto;
-        padding: 10px;
-        font-size: 0.85rem;
+        width: 80%;
+        text-align: center;
+        font-size: 1.1rem;
+        border-bottom: 1px solid var(--hunter-border) !important;
     }
 
     .container { padding: 10px; }
@@ -292,4 +399,6 @@ nav button.active { border-bottom: 2px solid var(--hunter-primary); color: var(-
     .news-grid { grid-template-columns: 1fr; }
     .card-slot { width: 90%; }
     .modal-content { padding: 20px; width: 95%; }
+    .news-content-scroll { padding: 20px; margin-top: -40px; }
+    .news-title-pro { font-size: 1.8rem; }
 }

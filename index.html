@@ -45,9 +45,10 @@
             <div id="user-info" style="font-family: var(--font-mono);">
                 Hunter: <span id="display-username">VISITANTE</span> | <span style="color: var(--hunter-primary)">ONLINE</span>
             </div>
+            <button id="hamburger-btn" onclick="toggleMobileMenu()">&#9776;</button>
         </header>
 
-        <nav>
+        <nav id="main-nav">
             <button onclick="showSection('profile')" class="nav-btn">MEU PERFIL</button>
             <button onclick="showSection('bank')" class="nav-btn">BANCO</button>
             <button onclick="showSection('news')" class="nav-btn active">NOTÍCIAS GLOBAIS</button>
@@ -70,6 +71,7 @@
                 <div style="flex: 2; min-width: 300px;">
                     <h2 id="profile-display-name" style="color: #fff; border-bottom: 2px solid var(--hunter-secondary); padding-bottom: 10px; margin-top: 0;"></h2>
                     <p><strong>RANK:</strong> <span id="profile-display-rank" style="color: var(--hunter-yellow); font-weight: bold;"></span></p>
+                    <button onclick="enableNotifications()" class="notification-btn">📡 ATIVAR COMUNICADOR (NOTIFICAÇÕES)</button>
                     <div id="profile-data" style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 8px; margin-top: 20px; font-family: var(--font-mono);"></div>
                     
                     <h3 style="color: var(--hunter-primary); margin-top: 30px; border-bottom: 1px solid var(--hunter-border); padding-bottom: 10px;">CAIXA DE ENTRADA</h3>
@@ -215,6 +217,23 @@
         </div>
     </div>
 
+    <!-- MODAL DE NOTÍCIA -->
+    <div id="news-modal" class="hidden">
+        <div class="modal-content news-modal-layout">
+            <span class="close-btn" onclick="closeNewsModal()" style="z-index: 20; background: rgba(0,0,0,0.6); border-radius: 50%; width: 40px; height: 40px; text-align: center; line-height: 40px; top: 15px; right: 15px;">&times;</span>
+            <img id="news-modal-img" class="news-header-img" src="">
+            <div class="news-content-scroll">
+                <h2 id="news-modal-title" class="news-title-pro"></h2>
+                <div class="news-meta-pro">
+                    <span>DATA: <span id="news-modal-date"></span></span>
+                    <span>|</span>
+                    <span>FONTE: REDAÇÃO HUNTER</span>
+                </div>
+                <div id="news-modal-content" class="news-body-pro"></div>
+            </div>
+        </div>
+    </div>
+
     <script>
         // --- DATA ---
         const charDB = [
@@ -298,11 +317,96 @@
 
         // --- NEWS DATA ---
         const newsDB = [
-            { title: "Pronunciamento Oficial do Império Kakin", date: "2026-02-10", content: "O Império Kakin anuncia que fará um pronunciamento oficial em breve. Rumores indicam preparativos para uma grande expedição.", img: "https://image.pollinations.ai/prompt/anime%20king%20nasubi%20kakin%20speech?width=600&height=400&nologo=true" },
-            { title: "Hisoka vs Chrollo na Torre Celestial", date: "2026-02-05", content: "Está marcada! A luta histórica entre Hisoka e Chrollo na Torre Celestial foi confirmada. Ingressos esgotaram em segundos.", img: "https://image.pollinations.ai/prompt/anime%20hisoka%20vs%20chrollo%20fight%20arena?width=600&height=400&nologo=true" },
-            { title: "Início do 299º Exame Hunter", date: "2026-01-15", content: "O 299º Exame dos Caçadores se iniciou. Milhares de candidatos buscam a licença mais cobiçada do mundo.", img: "https://image.pollinations.ai/prompt/anime%20hunter%20exam%20crowd%20running?width=600&height=400&nologo=true" },
-            { title: "Cheadle Yorkshire é a Nova Presidente", date: "2026-08-09", content: "A votação para presidente terminou. Cheadle Yorkshire é oficialmente a 14ª Presidente da Associação Hunter.", img: "https://image.pollinations.ai/prompt/anime%20cheadle%20yorkshire%20president?width=600&height=400&nologo=true" },
-            { title: "Boatos sobre Aposentadoria de Netero", date: "2026-01-01", content: "População civil recebe a falsa notícia da aposentadoria de Isaac Netero. Fontes internas sugerem manobra de desinformação.", img: "https://image.pollinations.ai/prompt/anime%20isaac%20netero%20meditation?width=600&height=400&nologo=true" }
+            { 
+                title: "Pronunciamento Oficial do Império Kakin", 
+                date: "1999-02-12", 
+                content: "O Império Kakin anuncia que fará um pronunciamento oficial em breve. Rumores indicam preparativos para uma grande expedição.", 
+                img: "https://i.pinimg.com/736x/bc/f0/e9/bcf0e9a8b5f36311e8b0fa7ce92c92cb.jpg",
+                fullText: `
+                    <p><strong>Por:</strong> Comitê Editorial Hunters<br>
+                    <strong>Publicado em:</strong> 12 de Fevereiro de 1999 | <strong>Edição Especial:</strong> O Pronunciamento</p>
+
+                    <h3>I. O DISCURSO: TRANSCRIÇÃO AUTORIZADA PELA AGÊNCIA DE PERMISSÃO INTERNACIONAL (IPA)</h3>
+                    <p>"Hoi! Cidadãos do mundo, dignitários do V5, membros da Associação Hunter."</p>
+                    <p>Sua Majestade Imperial, Nasbi Hoicuro, 52º imperador da Dinastia Hoicuro, iniciou sua fala com a interjeição cerimonial que remonta à fundação do Império de Kakin.</p>
+                    <p>"Há duzentos anos, a humanidade firmou um pacto de contenção. Um pacto que não foi assinado por Kakin. Não por descuido burocrático, nem por isolacionismo, mas por uma cláusula fundamental inscrita em nossa refundação nacional há três décadas, quando optamos por renascer das cinzas do sistema anterior e anular todos os tratados que não serviam aos interesses de nosso povo."</p>
+                    <p>O monarca fez uma pausa de exatos doze segundos — tempo registrado pelos cronometristas da Associação Hunter presentes na sala de imprensa.</p>
+                    <p>"O mundo conhecido — este arquipélago que chamamos de 'Moebius' — não passa de um lago. Um lago cercado por um território tão vasto que a mente humana é incapaz de dimensionar. Nossos ancestrais vieram de lá. As bestas mágicas que povoam nossos bestiários vieram de lá. Os recursos que podem erradicar a fome, curar o incurável e iluminar cidades inteiras com a energia de uma bolha d'água... também aguardam além deste horizonte artificial."</p>
+
+                    <h3>II. O ANÚNCIO DA EXPEDIÇÃO</h3>
+                    <p>"O Império de Kakin, no exercício de sua soberania e na observância de seu dever para com as gerações futuras, declara oficialmente o início da Operação Migração."</p>
+                    <p>Sua Majestade ergueu o selo imperial — o artefato conhecido como Urna da Origem, que permaneceu oculto do público por séculos.</p>
+                    <p>"A Baleia Negra — Black Whale No.1 — partirá do Porto de Aia em sessenta dias, transportando duzentos mil cidadãos de Kakin e de todas as nações que desejarem integrar esta jornada. Não como conquistadores. Não como saqueadores. Como pioneiros."</p>
+                    <p>Os telões atrás do trono exibiram, pela primeira vez, as plantas detalhadas da embarcação.</p>
+                    <p>"Nosso destino não é a guerra. Nosso destino é a sobrevivência. O Lago Moebius está saturado. Os recursos se esgotam. As populações crescem. A humanidade, confinada neste arquipélago por vinte gerações, esqueceu que outrora foi uma espécie migratória. Recordaremos."</p>
+
+                    <h3>III. A APRESENTAÇÃO DE BEYOND NETERO</h3>
+                    <p>Foi neste momento que o pronunciamento assumiu contornos históricos.</p>
+                    <p>"O comando científico e estratégico desta expedição será confiado ao Sr. Beyond Netero."</p>
+                    <p>Sob os holofotes do palácio imperial, Beyond Netero — filho de Isaac Netero, décimo segundo presidente da Associação Hunter — cruzou a cortina lateral e posicionou-se à direita do trono. Sua Majestade prosseguiu:</p>
+                    <p>"Um homem que conhece o Continente Negro não por lendas ou relíquias, mas por experiência própria. Um homem que herdou não apenas o sobrenome, mas a visão de que a fronteira não é um abismo a ser temido — é um destino a ser conquistado."</p>
+                    <p>Beyond Netero limitou-se a um aceno. Não discursou. Não saudou. Apenas permaneceu ao lado do trono, em silêncio, durante todo o restante do pronunciamento.</p>
+
+                    <h3>IV. OS NÚMEROS OFICIAIS APRESENTADOS</h3>
+                    <p>Sua Majestade apresentou, em sequência, os dados oficiais da Operação Migração:</p>
+                    <table style="width:100%; border-collapse: collapse; margin: 15px 0; border: 1px solid #555;">
+                    <tr style="background: rgba(255,255,255,0.1);"><th style="padding: 8px; border: 1px solid #555;">Item</th><th style="padding: 8px; border: 1px solid #555;">Número Oficial</th></tr>
+                    <tr><td style="padding: 8px; border: 1px solid #555;">Capacidade da Baleia Negra (Black Whale No.1)</td><td style="padding: 8px; border: 1px solid #555;">200.000 passageiros</td></tr>
+                    <tr><td style="padding: 8px; border: 1px solid #555;">Expansão da frota</td><td style="padding: 8px; border: 1px solid #555;">20 embarcações adicionais em até 1 ano</td></tr>
+                    <tr><td style="padding: 8px; border: 1px solid #555;">Meta populacional em 5 anos</td><td style="padding: 8px; border: 1px solid #555;">100 milhões de migrantes</td></tr>
+                    <tr><td style="padding: 8px; border: 1px solid #555;">Prazo para adequação do V5</td><td style="padding: 8px; border: 1px solid #555;">Até a cúpula de junho do corrente ano</td></tr>
+                    </table>
+                    <p>"Estes números não são projeções. São compromissos. O Império de Kakin dispõe dos recursos, da infraestrutura e da vontade política para executá-los. Aguardamos apenas que as burocracias internacionais se atualizem à nova realidade."</p>
+
+                    <h3>V. O CONVITE À ASSOCIAÇÃO HUNTER</h3>
+                    <p>"Convidamos todos os Hunters licenciados — de todas as afiliações, de todas as nacionalidades — a se juntarem a nós nesta jornada."</p>
+                    <p>O monarca inclinou-se ligeiramente na direção das câmeras.</p>
+                    <p>"Não como mercenários. Não como força de trabalho descartável. Como parceiros. O Continente Negro abriga espécies, ecossistemas e fenômenos que nenhum Hunter vivo jamais documentou. A contribuição da Associação será registrada nos anais da humanidade. Cada descoberta levará o nome de seu descobridor. Cada avanço será compartilhado — sob a supervisão de Kakin, mas em benefício de todos."</p>
+
+                    <h3>VI. A DECLARAÇÃO SOBRE O V5</h3>
+                    <p>"Ao V5 — ou ao que restará do V5 após esta data — declaramos:"</p>
+                    <p>Sua Majestade ergueu novamente o selo imperial.</p>
+                    <p>"Não solicitamos permissão. Não a solicitaremos. Kakin não violou tratado algum, pois jamais esteve vinculada ao Pacto de Contenção. Nossa posição jurídica é inatacável. Nossa posição estratégica é irreversível."</p>
+                    <p>A pausa foi novamente calculada.</p>
+                    <p>"No entanto, reconhecemos que a estabilidade global é um bem que deve ser preservado. Portanto, estendemos a mão à negociação. Uma cadeira no conselho — a sexta cadeira — com os mesmos direitos, os mesmos deveres e a mesma participação nos benefícios da exploração do Continente Negro que qualquer das cinco nações atualmente detém."</p>
+
+                    <h3>VII. A ADVERTÊNCIA FINAL</h3>
+                    <p>"Cidadãos do mundo."</p>
+                    <p>O tom de Sua Majestade alterou-se. O registro cerimonial cedeu espaço a algo mais grave.</p>
+                    <p>"O Continente Negro não é um inimigo. Não é uma maldição. É um recurso natural. Como o fogo, como a eletricidade, como o próprio Nen — pode destruir os imprudentes e iluminar os preparados."</p>
+                    <p>O monarca ergueu-se do trono pela primeira vez.</p>
+                    <p>"Kakin está preparada. Nossos sacerdotes estudaram os relatos das cento e quarenta e nove expedições anteriores. Nossos engenheiros projetaram embarcações capazes de suportar as criaturas da Calmaria. Nossos Hunters — os melhores que nosso sistema educacional pôde formar — estão prontos para enfrentar o desconhecido."</p>
+                    <p>A última frase foi pronunciada com os olhos fixos na lente principal.</p>
+                    <p>"A humanidade nasceu além do horizonte. É hora de retornar para casa."</p>
+
+                    <h3>VIII. O ENCERRAMENTO</h3>
+                    <p>"Hoi."</p>
+                    <p>Sua Majestade recolheu o selo imperial, inclinou-se cerimonialmente e retirou-se da tribuna. O pronunciamento durou exatos dezoito minutos e quarenta e sete segundos.</p>
+                    <p>Beyond Netero permaneceu no palco até que as cortinas se fechassem.</p>
+                    <p>Nenhuma pergunta foi respondida.</p>
+                    <p>Nenhuma entrevista coletiva foi concedida.</p>
+                    <p>O mundo, naquele instante, já não era o mesmo.</p>
+                    <hr>
+                    <p><small>© 1999 — Redação Hunters<br>
+                    Transcrição autorizada mediante verificação com a Agência de Permissão Internacional (IPA)<br>
+                    É vedada a reprodução parcial sem autorização expressa</small></p>
+                    <p><small>NOTA DA EDIÇÃO: Esta edição limitou-se estritamente à transcrição e análise textual do pronunciamento oficial. Informações sobre a Guerra de Sucessão, as Bestas Guardiãs, os movimentos da Família Real e os desdobramentos diplomáticos serão publicadas em edições posteriores, conforme autorização das fontes e respeitando os acordos de confidencialidade firmados por esta Redação.</small></p>
+                `
+            },
+            { 
+                title: "Hisoka vs Chrollo na Torre Celestial", 
+                date: "1999-02-05", 
+                content: "Está marcada! A luta histórica entre Hisoka e Chrollo na Torre Celestial foi confirmada. Ingressos esgotaram em segundos.", 
+                img: "https://i.pinimg.com/1200x/94/0a/94/940a947ad01df5b5214ca5258f5cf656.jpg",
+                fullText: `<p>A Arena dos Céus será palco de um dos confrontos mais aguardados dos últimos tempos. Hisoka, o enigmático e imprevisível lutador conhecido por sua sede por batalhas contra oponentes poderosos, retorna ao local onde construiu parte de sua fama — e de sua reputação mortal.</p>
+                <p>Hisoka já marcou seu nome na história da Arena. Foi ali que demonstrou seu talento brutal, sua inteligência estratégica e sua capacidade de transformar cada combate em um espetáculo sangrento. Com um histórico de vitórias impactantes e confrontos memoráveis, ele consolidou sua imagem como um dos lutadores mais perigosos que já pisaram naquele ringue. Para muitos fãs, a Arena é território natural de Hisoka — um palco onde ele se sente em casa.</p>
+                <p>Do outro lado estará Chrollo, conhecido simplesmente como o líder da Trupe. Figura central e mente por trás do grupo, ele carrega o peso e a responsabilidade de comandar uma das organizações mais temidas do submundo.</p>
+                <p>A expectativa é gigantesca. Os ingressos foram esgotados em poucos minutos após a abertura das vendas, confirmando o tamanho do interesse do público. A Arena dos Céus estará completamente lotada para presenciar esse duelo histórico.</p>
+                <p>Os holofotes estão acesos. O palco está pronto. E a Arena dos Céus voltará a tremer.</p>`
+            },
+            { title: "Início do 289º Exame Hunter", date: "1999-01-15", content: "O 289º Exame dos Caçadores se iniciou. Milhares de candidatos buscam a licença mais cobiçada do mundo.", img: "https://i.pinimg.com/736x/6f/13/57/6f1357bcd1ae767c059841e273f70b38.jpg" },
+            { title: "Cheadle Yorkshire é a Nova Presidente", date: "1999-08-09", content: "A votação para presidente terminou. Cheadle Yorkshire é oficialmente a 14ª Presidente da Associação Hunter.", img: "https://i.pinimg.com/1200x/08/09/81/08098183c2c0ffaf3539f41bdfc9ac6f.jpg" },
+            { title: "Boatos sobre Aposentadoria de Netero", date: "1999-01-01", content: "População civil recebe a falsa notícia da aposentadoria de Isaac Netero. Fontes internas sugerem manobra de desinformação.", img: "https://i.pinimg.com/1200x/fb/d1/65/fbd165318022ffc669df124bc3dd77c6.jpg" }
         ];
 
         const locationDB = [
@@ -375,11 +479,8 @@
                 rank: "Rank D",
                 info: { "Data de Nascimento": "11/06/1974", "Idade": "25 anos", "Tipo Sanguíneo": "O-", "Local de Nascimento": "Shimokitazawa (Tokyo)" },
                 messages: [],
-                balance: 150000,
-                transactions: [
-                    { date: "2026-02-01", desc: "Adiantamento de Missão", amount: 50000 },
-                    { date: "2026-01-20", desc: "Compra: Suprimentos", amount: -12500 }
-                ]
+                balance: 0,
+                transactions: []
             },
             "kageshiro": { 
                 name: "Kageshiro Kuruta", 
@@ -388,10 +489,8 @@
                 rank: "Rank D",
                 info: { "Data de Nascimento": "26/09/83", "Idade": "16 anos", "Tipo Sanguíneo": "O+", "Local de Nascimento": "Tribo Kuruta" },
                 messages: [],
-                balance: 850000,
-                transactions: [
-                    { date: "2026-01-15", desc: "Venda de Artefato", amount: 800000 }
-                ]
+                balance: 0,
+                transactions: []
             },
             "agnes": { 
                 name: "Agnes Morrígan Zoldyck", 
@@ -400,10 +499,8 @@
                 rank: "Rank D",
                 info: { "Data de Nascimento": "03/01/1969", "Idade": "30 anos", "Tipo Sanguíneo": "O-", "Local de Nascimento": "Ankoku Tairiku" },
                 messages: [],
-                balance: 5000000,
-                transactions: [
-                    { date: "2026-02-05", desc: "Transferência Familiar", amount: 2000000 }
-                ]
+                balance: 0,
+                transactions: []
             },
             "melissa": { 
                 name: "Melissa Ackerman", 
@@ -412,10 +509,8 @@
                 rank: "Rank D",
                 info: { "Data de Nascimento": "09/05/83", "Idade": "16 anos", "Tipo Sanguíneo": "A+", "Local de Nascimento": "Cidade do Meteoro" },
                 messages: [],
-                balance: 2500,
-                transactions: [
-                    { date: "2026-02-08", desc: "Aposta: Queda de Braço", amount: 500 }
-                ]
+                balance: 0,
+                transactions: []
             },
             "morana": { 
                 name: "Morana Ravenscar", 
@@ -424,16 +519,27 @@
                 rank: "Rank D",
                 info: { "Data de Nascimento": "09/02/1981", "Idade": "18 anos", "Tipo Sanguíneo": "AB-", "Local de Nascimento": "North Yorkshire, Inglaterra" },
                 messages: [],
-                balance: 12000000,
-                transactions: [
-                    { date: "2026-01-10", desc: "Herança (Parcela)", amount: 1000000 }
-                ]
+                balance: 0,
+                transactions: []
             }
         };
 
         let currentUser = null;
 
         // --- LOGIC ---
+
+        window.addEventListener('load', () => {
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('Service Worker: Registrado com sucesso.', reg))
+                    .catch(err => console.log('Service Worker: Falha no registro.', err));
+            }
+        });
+
+        function toggleMobileMenu() {
+            const nav = document.getElementById('main-nav');
+            nav.classList.toggle('mobile-nav-active');
+        }
 
         function togglePasswordVisibility() {
             const passInput = document.getElementById('login-pass');
@@ -478,6 +584,10 @@
             renderCreatures();
             renderLocations();
             if(currentUser.info) renderProfile();
+            handleUrlParams();
+
+            // Inicia a simulação de eventos recebidos (apenas para demonstração)
+            startEventSimulation();
         }
 
         function showSection(id) {
@@ -489,6 +599,12 @@
                 window.event.target.classList.add('active');
             }
 
+            // Fecha o menu mobile ao selecionar uma seção
+            const mainNav = document.getElementById('main-nav');
+            if (mainNav.classList.contains('mobile-nav-active')) {
+                mainNav.classList.remove('mobile-nav-active');
+            }
+
             if (id === 'hunter-search') {
                 searchHunters('');
             }
@@ -497,6 +613,14 @@
             }
             if (id === 'bank') {
                 renderBank();
+            }
+        }
+
+        function handleUrlParams() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const section = urlParams.get('section');
+            if (section) {
+                showSection(section);
             }
         }
 
@@ -600,9 +724,10 @@
         function renderNews() {
             const container = document.getElementById('news-container');
             container.innerHTML = ""; // Limpa o container para evitar duplicatas
-            newsDB.forEach(n => {
+            newsDB.forEach((n, index) => {
                 const div = document.createElement('div');
                 div.className = 'news-card';
+                div.onclick = () => openNews(index);
                 div.innerHTML = `
                     <img src="${n.img}" class="news-thumb">
                     <h4>${n.title}</h4>
@@ -723,6 +848,24 @@
             const char = charDB.find(c => c.name === name);
             if (!char) return;
 
+            // Restrição de Acesso (Zodíacos, Ging, Netero)
+            const restrictedNames = ["Ging Freecss", "Isaac Netero", "Pariston Hill", "Cheadle Yorkshire"];
+            if (char.type.includes("Zodíaco") || restrictedNames.includes(char.name)) {
+                document.getElementById('char-modal-img').src = "img/logo-hxh.png";
+                document.getElementById('char-modal-name').innerText = "ACESSO NEGADO";
+                document.getElementById('char-modal-name').style.color = "var(--hunter-secondary)";
+                document.getElementById('char-modal-nen').innerText = "---";
+                document.getElementById('char-modal-type').innerText = "ACESSO RESTRITO";
+                
+                const statusSpan = document.getElementById('char-modal-status');
+                statusSpan.innerText = "CLASSIFICADO";
+                statusSpan.style.color = "var(--hunter-secondary)";
+
+                document.getElementById('char-modal-desc').innerHTML = `<div style="text-align: center; color: var(--hunter-secondary); border: 1px solid var(--hunter-secondary); padding: 20px; background: rgba(255, 51, 85, 0.1);"><h3 style="margin-top: 0;">⚠️ VIOLAÇÃO DE PROTOCOLO</h3><p>Você não possui credenciais de segurança nível Zodíaco para acessar este arquivo.</p><p>Esta tentativa foi registrada e reportada ao Comitê Disciplinar.</p></div>`;
+                document.getElementById('character-modal').classList.remove('hidden');
+                return;
+            }
+
             document.getElementById('char-modal-img').src = char.img;
             document.getElementById('char-modal-name').innerText = char.name;
             document.getElementById('char-modal-nen').innerText = char.nenType || "Desconhecido";
@@ -754,6 +897,20 @@
             document.getElementById('location-modal').classList.add('hidden');
         }
 
+        function openNews(index) {
+            const news = newsDB[index];
+            document.getElementById('news-modal-img').src = news.img;
+            document.getElementById('news-modal-title').innerText = news.title;
+            document.getElementById('news-modal-date').innerText = news.date;
+            // Usa fullText se existir, senão usa content
+            document.getElementById('news-modal-content').innerHTML = news.fullText || news.content;
+            document.getElementById('news-modal').classList.remove('hidden');
+        }
+
+        function closeNewsModal() {
+            document.getElementById('news-modal').classList.add('hidden');
+        }
+
         function openMessage(msg) {
             document.getElementById('msg-modal-subject').innerText = msg.subject;
             document.getElementById('msg-modal-from').innerText = msg.from;
@@ -767,7 +924,64 @@
         }
 
         function logout() {
+            // Fecha o menu mobile ao sair
+            const mainNav = document.getElementById('main-nav');
+            if (mainNav.classList.contains('mobile-nav-active')) {
+                mainNav.classList.remove('mobile-nav-active');
+            }
             location.reload();
+        }
+
+        // --- SISTEMA DE NOTIFICAÇÕES ---
+
+        function enableNotifications() {
+            if (!("Notification" in window)) {
+                alert("Este dispositivo não suporta notificações do sistema Hunter.");
+                return;
+            }
+
+            Notification.requestPermission().then(permission => {
+                if (permission === "granted") {
+                    new Notification("Sistema Hunter", {
+                        body: "Comunicador sincronizado. Você receberá alertas de prioridade.",
+                        icon: "img/logo-hxh.png"
+                    });
+                } else {
+                    alert("Permissão negada. O comunicador permanecerá offline.");
+                }
+            });
+        }
+
+        function sendNotification(title, body) {
+            if (Notification.permission === "granted" && 'serviceWorker' in navigator && navigator.serviceWorker.controller) {
+                // Envia a mensagem para o Service Worker para que ele exiba a notificação
+                navigator.serviceWorker.controller.postMessage({
+                    type: 'show-notification',
+                    payload: { title, body, tag: 'new-message' } // A tag evita notificações duplicadas
+                });
+            } else {
+                console.log("Não foi possível enviar a notificação. Permissão não concedida ou Service Worker não está pronto.");
+            }
+        }
+
+        function startEventSimulation() {
+            // Simula o recebimento de uma mensagem urgente após 10 segundos de login
+            setTimeout(() => {
+                const newMessage = { subject: "ALERTA DE MISSÃO", date: "AGORA", from: "Associação Hunter", content: "Hunter, sua presença é solicitada no saguão principal. Uma nova espécie foi avistada próxima à fronteira de NGL.", read: false };
+                
+                if (currentUser && currentUser.messages) {
+                    currentUser.messages.unshift(newMessage);
+                    renderProfile(); // Atualiza a lista na tela
+                    sendNotification("Nova Mensagem Recebida", "Associação Hunter: ALERTA DE MISSÃO - Prioridade Alta");
+                    
+                    // Adiciona indicador visual no menu se estivermos em outra aba
+                    const profileBtn = document.querySelector("button[onclick=\"showSection('profile')\"]");
+                    if(profileBtn && !profileBtn.classList.contains('active')) {
+                        profileBtn.style.color = "var(--hunter-secondary)";
+                        profileBtn.innerText = "MEU PERFIL (!)";
+                    }
+                }
+            }, 10000); // 10 segundos
         }
     </script>
 </body>
