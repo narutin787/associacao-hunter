@@ -66,7 +66,10 @@
             <h3>FICHA DE DADOS PESSOAIS</h3>
             <div style="display: flex; gap: 30px; flex-wrap: wrap;">
                 <div style="flex: 1; min-width: 250px; max-width: 300px;">
-                    <img id="profile-display-img" src="" style="width: 100%; border-radius: 8px; border: 2px solid var(--hunter-primary); box-shadow: 0 0 15px rgba(0,210,255,0.2);">
+                    <div class="profile-img-container" onclick="changeProfilePic()">
+                        <img id="profile-display-img" src="" style="width: 100%; border-radius: 8px; border: 2px solid var(--hunter-primary); box-shadow: 0 0 15px rgba(0,210,255,0.2);">
+                        <div class="edit-profile-btn" title="Alterar Foto">✎</div>
+                    </div>
                 </div>
                 <div style="flex: 2; min-width: 300px;">
                     <h2 id="profile-display-name" style="color: #fff; border-bottom: 2px solid var(--hunter-secondary); padding-bottom: 10px; margin-top: 0;"></h2>
@@ -277,7 +280,7 @@
             { name: "Tonpa", type: "Candidato Eterno", nenType: "(confidencial)", status: "Vivo", img: "https://i.pinimg.com/1200x/e5/42/27/e54227e44847e5501576d6b17d8d95d1.jpg", desc: "O 'Esmagador de Novatos'. Veterano com mais de 30 tentativas no Exame Hunter. Especialista em sabotagem psicológica e sucos laxantes. Não possui interesse real em se tornar Hunter." },
             { name: "Milluki Zoldyck", type: "Assassino / Hacker", nenType: "(confidencial)", status: "Vivo", img: "https://i.pinimg.com/736x/ec/d5/9c/ecd59cfa27936950c0a5df054e298992.jpg", desc: "Segundo filho da Família Zoldyck. Gênio da computação e inventor. Raramente deixa a mansão. Responsável pela tortura e treinamento de Killua no passado." },
             { name: "Melody", type: "Hunter de Música", nenType: "(confidencial)", status: "Vivo", img: "https://i.pinimg.com/736x/5c/8b/90/5c8b9093f2486c8d54ee4b147e7c9bd8.jpg", desc: "Possui audição sobrenatural. Teve o corpo deformado ao ouvir um trecho da 'Sonata das Trevas'. Busca destruir a partitura original. Guarda-costas leal de Kurapika." },
-            { name: "Zushi", type: "Lutador da Arena", nenType: "(confidencial)", status: "Vivo", img: "https://i.pinimg.com/736x/f8/aa/99/f8aa99572972b2fdd0dd98d207173e25.jpg", desc: "Discípulo de Wing. Praticante dedicado do estilo Shingen-Ryu. Embora aprenda mais devagar que Gon e Killua, possui uma base sólida e determinação inabalável." },
+            { name: "Zushi", type: "Lutador da Arena", nenType: "(confidencial)", status: "Falecido", img: "https://i.pinimg.com/736x/f8/aa/99/f8aa99572972b2fdd0dd98d207173e25.jpg", desc: "Discípulo de Wing. Praticante dedicado do estilo Shingen-Ryu. Embora aprenda mais devagar que Gon e Killua, possui uma base sólida e determinação inabalável." },
             { name: "Wing", type: "Mestre Shingen-Ryu", nenType: "(confidencial)", status: "Vivo", img: "https://i.pinimg.com/1200x/b2/82/ef/b282ef5f92550c6b941304b67aa16105.jpg", desc: "Discípulo de Biscuit Krueger. Mentor de Gon e Killua na Torre Celestial. Responsável por ensinar-lhes os fundamentos do Nen. Aparência desleixada, mas mestre competente." },
             { name: "Shoot McMahon", type: "Hunter de Bestas", nenType: "(confidencial)", status: "Vivo", img: "https://i.pinimg.com/736x/1a/3c/56/1a3c56b5dd0eabc7e1d9c3e773299ee0.jpg", desc: "Discípulo de Morel. Habilidade: Hotel Rafflesia (Gaiola Flutuante). Tímido e reservado, superou seus medos durante a invasão ao palácio. Perdeu uma perna em combate contra Youpi." },
             { name: "Palm Siberia", type: "Hunter / Soldado", nenType: "(confidencial)", status: "Vivo", img: "https://i.pinimg.com/736x/b7/c8/71/b7c8716709975a8477672d42a0d89c52.jpg", desc: "Discípula de Knov. Transformada em soldado experimental pelas Formigas Quimera. Habilidade: Black Widow (Armadura de Cabelo). Mantém sua lealdade à humanidade." },
@@ -614,7 +617,9 @@
                 img: "https://i.pinimg.com/736x/de/b8/a8/deb8a8e4125920858843f7f0b08a8541.jpg", 
                 rank: "Rank D",
                 info: { "Data de Nascimento": "11/06/1974", "Idade": "25 anos", "Tipo Sanguíneo": "O-", "Local de Nascimento": "Shimokitazawa (Tokyo)" },
-                messages: [],
+                messages: [
+                    { subject: "Um Presente", from: "???", date: "1999-05-15", read: false, content: "olá minhas criancas quanto tempo nao entro em contato com voces, mas vejo que voces estao evoluindo(sim, eu vejo. SEMPRE vejo) bastante.Gosto disso<br>e para firmar mais ainda, tenho um presente pra voces : <a href='https://narutin787.github.io/missao-hxh/' target='_blank' style='color: var(--hunter-primary); text-decoration: underline;'>https://narutin787.github.io/missao-hxh/</a>" }
+                ],
                 balance: 0,
                 transactions: []
             },
@@ -624,7 +629,9 @@
                 img: "https://i.pinimg.com/474x/d2/72/53/d27253f73654f50980ef8d927838c604.jpg", 
                 rank: "Rank D",
                 info: { "Data de Nascimento": "26/09/83", "Idade": "16 anos", "Tipo Sanguíneo": "O+", "Local de Nascimento": "Tribo Kuruta" },
-                messages: [],
+                messages: [
+                    { subject: "Um Presente", from: "???", date: "1999-05-15", read: false, content: "olá minhas criancas quanto tempo nao entro em contato com voces, mas vejo que voces estao evoluindo(sim, eu vejo. SEMPRE vejo) bastante.Gosto disso<br>e para firmar mais ainda, tenho um presente pra voces : <a href='https://narutin787.github.io/missao-hxh/' target='_blank' style='color: var(--hunter-primary); text-decoration: underline;'>https://narutin787.github.io/missao-hxh/</a>" }
+                ],
                 balance: 0,
                 transactions: []
             },
@@ -634,7 +641,9 @@
                 img: "https://i.pinimg.com/736x/c6/5c/54/c65c544f845ea060659f52e8d9325a68.jpg", 
                 rank: "Rank D",
                 info: { "Data de Nascimento": "03/01/1969", "Idade": "30 anos", "Tipo Sanguíneo": "O-", "Local de Nascimento": "Ankoku Tairiku" },
-                messages: [],
+                messages: [
+                    { subject: "Um Presente", from: "???", date: "1999-05-15", read: false, content: "olá minhas criancas quanto tempo nao entro em contato com voces, mas vejo que voces estao evoluindo(sim, eu vejo. SEMPRE vejo) bastante.Gosto disso<br>e para firmar mais ainda, tenho um presente pra voces : <a href='https://narutin787.github.io/missao-hxh/' target='_blank' style='color: var(--hunter-primary); text-decoration: underline;'>https://narutin787.github.io/missao-hxh/</a>" }
+                ],
                 balance: 0,
                 transactions: []
             },
@@ -644,7 +653,9 @@
                 img: "img/melissa.jpeg", 
                 rank: "Rank D",
                 info: { "Data de Nascimento": "09/05/83", "Idade": "16 anos", "Tipo Sanguíneo": "A+", "Local de Nascimento": "Cidade do Meteoro" },
-                messages: [],
+                messages: [
+                    { subject: "Um Presente", from: "???", date: "1999-05-15", read: false, content: "olá minhas criancas quanto tempo nao entro em contato com voces, mas vejo que voces estao evoluindo(sim, eu vejo. SEMPRE vejo) bastante.Gosto disso<br>e para firmar mais ainda, tenho um presente pra voces : <a href='https://narutin787.github.io/missao-hxh/' target='_blank' style='color: var(--hunter-primary); text-decoration: underline;'>https://narutin787.github.io/missao-hxh/</a>" }
+                ],
                 balance: 0,
                 transactions: []
             },
@@ -654,7 +665,9 @@
                 img: "https://i.pinimg.com/474x/bc/39/81/bc39818658b14a19d84f6b23e0509fc1.jpg", 
                 rank: "Rank D",
                 info: { "Data de Nascimento": "09/02/1981", "Idade": "18 anos", "Tipo Sanguíneo": "AB-", "Local de Nascimento": "North Yorkshire, Inglaterra" },
-                messages: [],
+                messages: [
+                    { subject: "Um Presente", from: "???", date: "1999-05-15", read: false, content: "olá minhas criancas quanto tempo nao entro em contato com voces, mas vejo que voces estao evoluindo(sim, eu vejo. SEMPRE vejo) bastante.Gosto disso<br>e para firmar mais ainda, tenho um presente pra voces : <a href='https://narutin787.github.io/missao-hxh/' target='_blank' style='color: var(--hunter-primary); text-decoration: underline;'>https://narutin787.github.io/missao-hxh/</a>" }
+                ],
                 balance: 0,
                 transactions: []
             }
@@ -700,6 +713,14 @@
 
             if (users[u] && users[u].pass === p) {
                 currentUser = users[u];
+                currentUser.id = u; // Salva o ID (username) para uso no localStorage
+                
+                // CARREGAR DADOS SALVOS (FOTO) DO LOCALSTORAGE
+                const savedData = JSON.parse(localStorage.getItem('hunter_user_data') || '{}');
+                if (savedData[u] && savedData[u].img) {
+                    currentUser.img = savedData[u].img;
+                }
+
                 msg.style.color = "var(--hunter-primary)";
                 msg.innerText = "ACCESS GRANTED";
                 setTimeout(() => {
@@ -1048,7 +1069,7 @@
             document.getElementById('msg-modal-subject').innerText = msg.subject;
             document.getElementById('msg-modal-from').innerText = msg.from;
             document.getElementById('msg-modal-date').innerText = msg.date;
-            document.getElementById('msg-modal-content').innerText = msg.content;
+            document.getElementById('msg-modal-content').innerHTML = msg.content;
             document.getElementById('message-modal').classList.remove('hidden');
         }
 
@@ -1063,6 +1084,22 @@
                 mainNav.classList.remove('mobile-nav-active');
             }
             location.reload();
+        }
+
+        function changeProfilePic() {
+            const newUrl = prompt("Insira a URL da nova imagem de perfil:");
+            if (newUrl && newUrl.trim() !== "") {
+                // Atualiza visualmente
+                currentUser.img = newUrl.trim();
+                document.getElementById('profile-display-img').src = currentUser.img;
+                
+                // Salva no LocalStorage para persistir
+                const savedData = JSON.parse(localStorage.getItem('hunter_user_data') || '{}');
+                if (!savedData[currentUser.id]) savedData[currentUser.id] = {};
+                
+                savedData[currentUser.id].img = currentUser.img;
+                localStorage.setItem('hunter_user_data', JSON.stringify(savedData));
+            }
         }
 
         // --- SISTEMA DE NOTIFICAÇÕES ---
