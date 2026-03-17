@@ -66,9 +66,10 @@
             <h3>FICHA DE DADOS PESSOAIS</h3>
             <div style="display: flex; gap: 30px; flex-wrap: wrap;">
                 <div style="flex: 1; min-width: 250px; max-width: 300px;">
-                    <div class="profile-img-container" onclick="changeProfilePic()">
+                    <div class="profile-img-container" onclick="document.getElementById('profile-upload-input').click()">
                         <img id="profile-display-img" src="" style="width: 100%; border-radius: 8px; border: 2px solid var(--hunter-primary); box-shadow: 0 0 15px rgba(0,210,255,0.2);">
                         <div class="edit-profile-btn" title="Alterar Foto">✎</div>
+                        <input type="file" id="profile-upload-input" accept="image/*" style="display: none;" onchange="handleProfileUpload(this)">
                     </div>
                 </div>
                 <div style="flex: 2; min-width: 300px;">
@@ -1086,19 +1087,32 @@
             location.reload();
         }
 
-        function changeProfilePic() {
-            const newUrl = prompt("Insira a URL da nova imagem de perfil:");
-            if (newUrl && newUrl.trim() !== "") {
-                // Atualiza visualmente
-                currentUser.img = newUrl.trim();
-                document.getElementById('profile-display-img').src = currentUser.img;
+        function handleProfileUpload(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
                 
-                // Salva no LocalStorage para persistir
-                const savedData = JSON.parse(localStorage.getItem('hunter_user_data') || '{}');
-                if (!savedData[currentUser.id]) savedData[currentUser.id] = {};
-                
-                savedData[currentUser.id].img = currentUser.img;
-                localStorage.setItem('hunter_user_data', JSON.stringify(savedData));
+                reader.onload = function(e) {
+                    const base64Image = e.target.result;
+
+                    // Atualiza visualmente
+                    currentUser.img = base64Image;
+                    document.getElementById('profile-display-img').src = currentUser.img;
+                    
+                    // Salva no LocalStorage para persistir
+                    const savedData = JSON.parse(localStorage.getItem('hunter_user_data') || '{}');
+                    if (!savedData[currentUser.id]) savedData[currentUser.id] = {};
+                    
+                    savedData[currentUser.id].img = currentUser.img;
+                    
+                    try {
+                        localStorage.setItem('hunter_user_data', JSON.stringify(savedData));
+                    } catch (err) {
+                        alert("A imagem selecionada é muito grande para o armazenamento local. Tente uma imagem menor.");
+                        console.error("Erro ao salvar imagem:", err);
+                    }
+                };
+
+                reader.readAsDataURL(input.files[0]);
             }
         }
 
